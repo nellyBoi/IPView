@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsScene
 
-from events import Events
+from eventdata import EventData
 from ipview_ui_base import Ui_MainWindow  # importing our generated file
 
 
@@ -18,7 +18,7 @@ class MyWindow(QtWidgets.QMainWindow):
     def __init__(self):
 
         # instantiate events that holds and handles non-ui related data
-        self.events = Events()
+        self.events = EventData()
 
         super(MyWindow, self).__init__()
         self.ui = Ui_MainWindow()

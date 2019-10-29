@@ -60,7 +60,7 @@ class ImageDirectory:
 
         # only read into the buffer if there is room for it
         if self._read_index < self._num_files:
-            self._buff.push(image=im.Image(file_name=self.acceptable_files[self._read_index]))
+            self._buff.forward(image=im.Image(file_name=self.acceptable_files[self._read_index]))
             self._read_index += 1
 
         self._current_file_index += 1
@@ -116,7 +116,7 @@ class ImageDirectory:
         buffer_size = self._buffer_size
         num_files = self._num_files
         for ind in np.arange(np.min([buffer_size, num_files])):
-            self._buff.push(image=im.Image(file_name=self.acceptable_files[self._read_index]))
+            self._buff.forward(image=im.Image(file_name=self.acceptable_files[self._read_index]))
             self._read_index += 1
 
     ####################################################################################################################
