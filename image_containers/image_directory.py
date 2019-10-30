@@ -13,13 +13,12 @@ from os import listdir
 import numpy as np
 from PyQt5.QtWidgets import QApplication
 
-import buffer as bfr
+import directorybuffer as bfr
 from image_containers import image as im
 
 
 ########################################################################################################################
 class ImageDirectory:
-
     ALLOWABLE_EXTENSIONS = ['.jpg', '.jpeg', '.JPG', '.png', '.PNG', '.tif', '.TIF']
 
     ####################################################################################################################
@@ -29,10 +28,20 @@ class ImageDirectory:
         :param buffer_size: 
         """
         self._path_directory = path_directory
-        self._buffer_size = buffer_size
-        self._current_file_index = 0
-        self._read_index = 0
+        # force odd buffer
+        if buffer_size % 2 == 0:
+            self._buffer_size = buffer_size - 1
+        else:
+            self._buffer_size = buffer_size
+
+        self._current_file_index = -1
+        self._read_index = -1
         self._buff = None
+        self.acceptable_files = None
+        self._num_files = None
+
+        # used to control where the buff sits relative to the current image
+        self.__middle_of_buffer_index = (self._buffer_size - 1) / 2
 
     ####################################################################################################################
     def begin_read(self) -> None:
@@ -41,29 +50,57 @@ class ImageDirectory:
         :return: None
         """
         self._allowable_files()
-        self._buff = bfr.CircularBuffer(buffer_size=self._buffer_size)
+        self._buff = bfr.DirectoryBuffer(buffer_size=self._buffer_size)
         self._initialize_read()
 
     ####################################################################################################################
     def has_next(self) -> bool:
         """
-        :return: True if another image available. False if not.
+        :return: True if the next image is available. False if not.
         """
-        return self._current_file_index < self._num_files
+        return self._current_file_index < self._num_files - 1
 
     ####################################################################################################################
-    def next_image(self) -> im.Image:
+    def forward(self) -> im.Image:
         """
         :return: next image object from file in list.
         """
+        if not self.has_next():
+            return None
+
+        self._current_file_index += 1
         image = self._buff.get_data_at_index(self._current_file_index)
 
         # only read into the buffer if there is room for it
-        if self._read_index < self._num_files:
-            self._buff.forward(image=im.Image(file_name=self.acceptable_files[self._read_index]))
-            self._read_index += 1
+        if self.__middle_of_buffer_index < self._current_file_index < self._num_files - self.__middle_of_buffer_index:
+            _read_index = int(self._current_file_index + self.__middle_of_buffer_index)
+            self._buff.push_to_back(image=im.Image(file_name=self.acceptable_files[_read_index]))
 
-        self._current_file_index += 1
+        return image
+
+    ####################################################################################################################
+    def has_last(self) -> bool:
+        """
+        :return: True if the last image is available. False if not.
+        """
+        return self._current_file_index > 0
+
+    ####################################################################################################################
+    def backward(self) -> im.Image:
+        """
+        :return: last image object from file in list.
+        """
+        if not self.has_next():
+            return None
+
+        self._current_file_index -= 1
+
+        image = self._buff.get_data_at_index(self._current_file_index)
+
+        # only read into the buffer if there is room for it
+        if self._current_file_index - 1 >= self.__middle_of_buffer_index:
+            _read_index = int(self._current_file_index - self.__middle_of_buffer_index)
+            self._buff.push_to_front(image=im.Image(file_name=self.acceptable_files[_read_index]))
 
         return image
 
@@ -107,17 +144,7 @@ class ImageDirectory:
 
         return
 
-    ####################################################################################################################
-    def _initialize_read(self) -> None:
-        """
-        Read the first 'self._buffer_size' images from directory and store them in buffer.
-        :return:
-        """
-        buffer_size = self._buffer_size
-        num_files = self._num_files
-        for ind in np.arange(np.min([buffer_size, num_files])):
-            self._buff.forward(image=im.Image(file_name=self.acceptable_files[self._read_index]))
-            self._read_index += 1
+
 
     ####################################################################################################################
     @staticmethod
@@ -132,22 +159,51 @@ class ImageDirectory:
 ########################################################################################################################
 if __name__ == '__main__':
 
+    TEST_BACKWARDS = True
+
     import sys
 
     app = QApplication(sys.argv)
 
-    
     dir_path = r'data/images'
     image_directory = ImageDirectory(path_directory=dir_path, buffer_size=4)
     image_directory.begin_read()
-    w0 = im.Window(image_directory.next_image())
-    w0.show()
     list_of_windows = []
-    list_of_windows.append(w0)
-    while image_directory.has_next() is True:
 
-        w = im.Window(image_directory.next_image())
+    if TEST_BACKWARDS:
+        # image 1
+        w = im.Window(image_directory.forward())
         w.show()
         list_of_windows.append(w)
+        # image 2
+        w = im.Window(image_directory.forward())
+        w.show()
+        list_of_windows.append(w)
+        # image 3
+        w = im.Window(image_directory.forward())
+        w.show()
+        list_of_windows.append(w)
+        # image 4
+        w = im.Window(image_directory.forward())
+        w.show()
+        list_of_windows.append(w)
+        # image 3
+        w = im.Window(image_directory.backward())
+        w.show()
+        list_of_windows.append(w)
+        # image 2
+        w = im.Window(image_directory.backward())
+        w.show()
+        list_of_windows.append(w)
+        # image 1
+        w = im.Window(image_directory.backward())
+        w.show()
+        list_of_windows.append(w)
+    else:
+        while image_directory.has_next() is True:
 
-    sys.exit(app.exec_())
+            w = im.Window(image_directory.forward())
+            w.show()
+            list_of_windows.append(w)
+
+        sys.exit(app.exec_())

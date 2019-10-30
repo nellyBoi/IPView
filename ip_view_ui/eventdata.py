@@ -36,7 +36,7 @@ class EventData:
         """
         """
         if self.__image_directory.has_next():
-            return self.__image_directory.next_image()
+            return self.__image_directory.forward()
         else:
             return None
 
