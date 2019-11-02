@@ -37,7 +37,8 @@ class DirectoryBuffer:
         a circular manner.
         - current object being read will exist in the 'middle' of the buffer from a directory position point of view,
         although it is important to note this is not necessarily the center buffer element since objects will be
-        replaced in a circular fashion.
+        replaced in a circular fashion. The current file being read should always be center of data kept in buffer,
+        which is an important thing to keep in mind for logic pertaining to if a new file should be replaced or not.
     """
 
     ####################################################################################################################
@@ -82,12 +83,15 @@ class DirectoryBuffer:
         Method to return the next image object in list of compatible files.
         :return: im.Image object
         """
+        if not self.has_next():
+            return None
+
+        self.__file_list_read_idx += 1
         self.__increment_buffer_read_idx()
         this_image = self.__data[self.__buffer_read_idx]
 
-        self.__file_list_read_idx += 1
-
-        # replace object in buffer only if conditions are met
+        # replace object in buffer only if replace-file exists and if the current read is larger than middle-of-buffer
+        # index, meaning that buffer should actually be shifted up 1.
         if self.__file_list_read_idx > self.__middle_of_buffer and self.__file_list_replace_idx < (
                 self.__num_files - 1):
             self.__file_list_replace_idx += 1
@@ -106,13 +110,19 @@ class DirectoryBuffer:
         Method to return the next image object in list of compatible files.
         :return: im.Image object
         """
+        if not self.has_previous():
+            return None
+
+        self.__file_list_read_idx -= 1
         self.__decrement_buffer_read_idx()
         this_image = self.__data[self.__buffer_read_idx]
 
-        self.__file_list_read_idx -= 1
+        # since we only hold the index of the 'front' of the buffer and a backwards replace needs to occur with files
+        # from the back, we define a temp index to represent the file that would be used in the replacement.
+        temp_file_read_index = self.__file_list_replace_idx - self.__buffer_size
 
-        # replace object in buffer only if conditions are met
-        if self.__file_list_read_idx > (self.__middle_of_buffer - 1):
+        # replace object in buffer only if file for replacement exists and if buffer should be shifted down by 1.
+        if temp_file_read_index >= 0 and (self.__num_files - self.__file_list_read_idx - 1) > self.__middle_of_buffer:
             self.__file_list_replace_idx -= 1
 
             if self.__read_direction == Direction.BACKWARDS:
@@ -243,7 +253,7 @@ if __name__ == '__main__':
     for file in os.listdir(dir_path):
         files_name_only.append(ntpath.basename(file))
 
-    directory_buffer = DirectoryBuffer(directory=dir_path, compatible_files=files_name_only, buffer_size=3)
+    directory_buffer = DirectoryBuffer(directory=dir_path, compatible_files=files_name_only, buffer_size=1)
 
     list_of_windows = []
     while directory_buffer.has_next():  # test forwards
