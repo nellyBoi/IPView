@@ -262,5 +262,9 @@ if __name__ == '__main__':
     w = im.Window(image=image)
     w.show()
     list_of_windows.append(w)
+    image = directory_buffer.next_image()
+    w = im.Window(image=image)
+    w.show()
+    list_of_windows.append(w)
 
     sys.exit(app.exec_())
