@@ -272,6 +272,13 @@ class ImageDirectory(DirectoryBuffer):
                          buffer_size=buffer_size)
 
     ####################################################################################################################
+    def get_list_of_allowable_files(self) -> list:
+        """
+        :return: list of allowable files
+        """
+        return self.__acceptable_files
+
+    ####################################################################################################################
     def __allowable_files(self) -> None:
         """
         A method to store files only with extensions defined in ALLOWABLE_EXTENSIONS in a list.

@@ -1,38 +1,21 @@
 """
-File to run the ui.
+Nelly Kane
+11.02.2019
+
+ipview_viewer.py
+
+File to open and run IPView.
 """
 import sys
-from ipview_ui import MyWindow
-from PyQt5 import QtWidgets
+from ipview_ui import IPViewWindow
 
 
 ########################################################################################################################
-class IPViewer:
+def launch() -> IPViewWindow:
     """
-
+    :return: None
     """
-
-    ####################################################################################################################
-    def __init__(self):
-        """
-
-        """
-        self.app = QtWidgets.QApplication([])
-        self.application = MyWindow()
-
-    ####################################################################################################################
-    def launch(self) -> None:
-        """
-        :return: None
-        """
-        self.application.show()
-        try:
-            sys.exit(self.app.exec())
-        except:
-            print('Exiting')
-
-        return
-
+    return IPViewWindow()
 
 ########################################################################################################################
 def my_exception_hook(exctype, value, traceback):
@@ -42,15 +25,11 @@ def my_exception_hook(exctype, value, traceback):
     sys._excepthook(exctype, value, traceback)
     sys.exit(1)
 
-
-
-
 ########################################################################################################################
 if __name__ == '__main__':
-    # Back up the reference to the exceptionhook
+
     sys._excepthook = sys.excepthook
     sys.excepthook = my_exception_hook
 
-    viewer = IPViewer()
-    viewer.launch()
+    viewer = launch()
 

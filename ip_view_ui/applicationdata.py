@@ -1,14 +1,14 @@
 """
 
 """
-from image_containers import image_directory as im_dir
+from image_containers import imagedirectory as im_dir
 from image_containers import image as im
 
 BUFFER_SIZE = 3
 
 
 ########################################################################################################################
-class EventData:
+class ApplicationData:
     """
 
     """
@@ -25,8 +25,7 @@ class EventData:
         """
         """
         self.__directory = directory
-        self.__image_directory = im_dir.ImageDirectory(path_directory=directory, buffer_size=BUFFER_SIZE)
-        self.__image_directory.begin_read()
+        self.__image_directory = im_dir.ImageDirectory(directory=directory, buffer_size=BUFFER_SIZE)
         self.__allowable_files = self.__image_directory.get_list_of_allowable_files()
 
         return self.__allowable_files
@@ -36,7 +35,7 @@ class EventData:
         """
         """
         if self.__image_directory.has_next():
-            return self.__image_directory.forward()
+            return self.__image_directory.next_image()
         else:
             return None
 
@@ -44,4 +43,4 @@ class EventData:
     def clear_data(self) -> str:
         """
         """
-        self.__image_directory.clear_memory()
+        self.__image_directory.clear()
