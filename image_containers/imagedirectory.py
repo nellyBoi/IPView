@@ -1,5 +1,5 @@
 """
-file: directorybuffer.py
+file: imagedirectory.py
 author: Nelly Kane
 date_originated: 10.29.2019
 
@@ -246,6 +246,61 @@ class DirectoryBuffer:
 
 
 ########################################################################################################################
+class ImageDirectory(DirectoryBuffer):
+    """
+    Class to iterate through a directory both forwards and backwards while skipping files that are incompatible. Images
+    are stored in a buffer.
+    """
+    ALLOWABLE_EXTENSIONS = ['.jpg', '.jpeg', '.JPG', '.png', '.PNG', '.tif', '.TIF']
+
+    ####################################################################################################################
+    def __init__(self, directory: str, buffer_size: int = 5):
+        """
+        :param directory:
+        :param buffer_size:
+        """
+        self.__directory = directory
+        self.__buffer_size = buffer_size
+        self.__acceptable_files = None
+        self.__num_acceptable_files = None
+
+        # get list of compatible files which internally stores in self.__acceptable_files
+        self.__allowable_files()
+
+        # call parent constructor on allowable files
+        super().__init__(directory=self.__directory, compatible_files=self.__acceptable_files,
+                         buffer_size=buffer_size)
+
+    ####################################################################################################################
+    def __allowable_files(self) -> None:
+        """
+        A method to store files only with extensions defined in ALLOWABLE_EXTENSIONS in a list.
+        :return: self.acceptable_files, self_num_files
+        """
+        all_files = ImageDirectory.list_all_files(path_dir=self.__directory)
+
+        acceptable_files = []
+        for current_file in all_files:
+            file_ext = os.path.splitext(current_file)[-1]
+            if file_ext in ImageDirectory.ALLOWABLE_EXTENSIONS:
+                acceptable_files.append(ntpath.basename(current_file))
+
+        self.__acceptable_files = acceptable_files
+        self.__num_acceptable_files = len(self.__acceptable_files)
+
+        return
+
+    ####################################################################################################################
+    @staticmethod
+    def list_all_files(path_dir: str) -> list:
+        """
+        :param path_dir: path to dir
+        :return: list of files in dir
+        """
+        return [os.path.join(path_dir, f) for f in os.listdir(path_dir) if os.path.isfile(os.path.join(path_dir, f))]
+
+
+########################################################################################################################
 if __name__ == '__main__':
 
     from PyQt5.QtWidgets import QApplication
@@ -254,32 +309,26 @@ if __name__ == '__main__':
 
     dir_path = r'data/images'
 
-    # get list of files
-    files_name_only = []
-    for file in os.listdir(dir_path):
-        files_name_only.append(ntpath.basename(file))
-
-    directory_buffer = DirectoryBuffer(directory=dir_path, compatible_files=files_name_only, buffer_size=3)
+    image_directory = ImageDirectory(directory=dir_path)
 
     list_of_windows = []
-    while directory_buffer.has_next():  # test forwards
-        image = directory_buffer.next_image()
+    while image_directory.has_next():  # test forwards
+        image = image_directory.next_image()
         w = im.Window(image=image)
         w.show()
         list_of_windows.append(w)
-    while directory_buffer.has_previous():  # test backwards
-        image = directory_buffer.previous_image()
+    while image_directory.has_previous():  # test backwards
+        image = image_directory.previous_image()
         w = im.Window(image=image)
         w.show()
         list_of_windows.append(w)
 
-    # show one more forwards
-
-    image = directory_buffer.next_image()
+    # show two more forwards
+    image = image_directory.next_image()
     w = im.Window(image=image)
     w.show()
     list_of_windows.append(w)
-    image = directory_buffer.next_image()
+    image = image_directory.next_image()
     w = im.Window(image=image)
     w.show()
     list_of_windows.append(w)
