@@ -30,11 +30,12 @@ class DirectoryBuffer:
     """
     Class to store buffer_size im.Image objects created externally from a provided directory.
     HOW IT WORKS:
-        - Buffer construction will read the first 'buffer_size' compatible files into the buffer.
-        - read_index will begin at -1. As next file is read 'read_index' will increment by 1 and read a new image. If
-        the last is called for read, 'read_index' will decrement by 1.
-        -  buffer_index for  creating new im.Image objects will occur internally, replacing objects in the buffer in
-        a circular manner.
+        - Buffer construction will read the first 'buffer_size' compatible files into the buffer, unless the buffer_size
+        is 1, then any read waits for the first image to be called.
+        - read_index will begin at -1. As 'next_image()' is called 'read_index' will increment by 1 and read a new
+        image. If 'previous_image()' is called, 'read_index' will decrement by 1.
+        -  buffer indices for reading from the buffer and replacing objects in the buffer is managed internally and the
+        object swaps occur in a circular fashion.
         - current object being read will exist in the 'middle' of the buffer from a directory position point of view,
         although it is important to note this is not necessarily the center buffer element since objects will be
         replaced in a circular fashion. The current file being read should always be center of data kept in buffer,
@@ -61,7 +62,7 @@ class DirectoryBuffer:
             self.__buffer_size = buffer_size
 
         # instantiating buffer data
-        self.__data = [None] * buffer_size
+        self.__data = [None] * self.__buffer_size
 
         # middle index of buffer
         self.__middle_of_buffer = int((self.__buffer_size - 1) / 2)
@@ -87,13 +88,11 @@ class DirectoryBuffer:
             return None
 
         self.__file_list_read_idx += 1
-        self.__increment_buffer_read_idx()
-        this_image = self.__data[self.__buffer_read_idx]
 
         # replace object in buffer only if replace-file exists and if the current read is larger than middle-of-buffer
         # index, meaning that buffer should actually be shifted up 1.
         if self.__file_list_read_idx > self.__middle_of_buffer and self.__file_list_replace_idx < (
-                self.__num_files - 1):
+                self.__num_files - 1) or self.__buffer_size == 1:
             self.__file_list_replace_idx += 1
 
             if self.__read_direction == Direction.FORWARDS:
@@ -102,7 +101,9 @@ class DirectoryBuffer:
             self.__read_direction = Direction.FORWARDS
             self.__push_to_back()
 
-        return this_image
+        self.__increment_buffer_read_idx()
+
+        return self.__data[self.__buffer_read_idx]
 
     ####################################################################################################################
     def previous_image(self) -> im.Image:
@@ -114,15 +115,14 @@ class DirectoryBuffer:
             return None
 
         self.__file_list_read_idx -= 1
-        self.__decrement_buffer_read_idx()
-        this_image = self.__data[self.__buffer_read_idx]
 
         # since we only hold the index of the 'front' of the buffer and a backwards replace needs to occur with files
         # from the back, we define a temp index to represent the file that would be used in the replacement.
         temp_file_read_index = self.__file_list_replace_idx - self.__buffer_size
 
         # replace object in buffer only if file for replacement exists and if buffer should be shifted down by 1.
-        if temp_file_read_index >= 0 and (self.__num_files - self.__file_list_read_idx - 1) > self.__middle_of_buffer:
+        if ((temp_file_read_index >= 0 and (self.__num_files - self.__file_list_read_idx - 1) > self.__middle_of_buffer)
+                or self.__buffer_size == 1):
             self.__file_list_replace_idx -= 1
 
             if self.__read_direction == Direction.BACKWARDS:
@@ -131,7 +131,9 @@ class DirectoryBuffer:
             self.__read_direction = Direction.BACKWARDS
             self.__push_to_front()
 
-        return this_image
+        self.__decrement_buffer_read_idx()
+
+        return self.__data[self.__buffer_read_idx]
 
     ####################################################################################################################
     def has_next(self) -> bool:
@@ -163,6 +165,10 @@ class DirectoryBuffer:
         Read the first 'self.__buffer_size' images from directory and store them in buffer.
         """
         self.__read_direction = Direction.FORWARDS
+
+        if self.__buffer_size == 1:
+            return
+
         for idx in np.arange(np.min([self.__buffer_size, self.__num_files])):
             self.__file_list_replace_idx += 1
             self.__increment_buffer_replace_idx()
@@ -253,7 +259,7 @@ if __name__ == '__main__':
     for file in os.listdir(dir_path):
         files_name_only.append(ntpath.basename(file))
 
-    directory_buffer = DirectoryBuffer(directory=dir_path, compatible_files=files_name_only, buffer_size=1)
+    directory_buffer = DirectoryBuffer(directory=dir_path, compatible_files=files_name_only, buffer_size=3)
 
     list_of_windows = []
     while directory_buffer.has_next():  # test forwards
@@ -268,6 +274,7 @@ if __name__ == '__main__':
         list_of_windows.append(w)
 
     # show one more forwards
+
     image = directory_buffer.next_image()
     w = im.Window(image=image)
     w.show()
