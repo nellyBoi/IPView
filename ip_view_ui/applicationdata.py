@@ -40,6 +40,15 @@ class ApplicationData:
             return None
 
     ####################################################################################################################
+    def get_previous_image(self) -> im.Image:
+        """
+        """
+        if self.__image_directory.has_previous():
+            return self.__image_directory.previous_image()
+        else:
+            return None
+
+    ####################################################################################################################
     def clear_data(self) -> str:
         """
         """

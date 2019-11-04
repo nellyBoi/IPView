@@ -26,7 +26,7 @@ class IPViewWindow(Ui_MainWindow): # QtWidgets.QMainWindow
         app.processEvents()
 
         # instantiate events that holds and handles non-ui related data
-        self.events = ApplicationData()
+        self.app_data = ApplicationData()
 
         main_window = QtWidgets.QMainWindow()
         # main_window.setWindowTitle("IPView")

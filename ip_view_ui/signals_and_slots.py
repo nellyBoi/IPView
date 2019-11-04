@@ -8,9 +8,12 @@ IPView signals, slots and connections.
 """
 from ipview_ui import IPViewWindow
 
+import image as im
+
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtCore import Qt
+
 
 ########################################################################################################################
 class Signals:
@@ -25,6 +28,7 @@ class Signals:
         self.directory_load_pushed = ui.directory_load_push.clicked
         self.clear_pushed = ui.clear_push_button.clicked
         self.next_button_pushed = ui.next_button.clicked
+        self.previous_button_pushed = ui.previous_button.clicked
 
 
 ########################################################################################################################
@@ -44,7 +48,7 @@ class Slots:
         Slot method for loading directory upon load push button.
         """
         directory = self.ui.directory_input.toPlainText()
-        files_for_display = self.ui.events.load_directory(directory=directory)
+        files_for_display = self.ui.app_data.load_directory(directory=directory)
         if len(files_for_display) == 0:
             self.ui.text_list_display.setText('No Compatible Images')
         else:
@@ -53,26 +57,47 @@ class Slots:
 
         return
 
-########################################################################################################################
+    ####################################################################################################################
     def clear_button_pushed(self) -> None:
         """
         Slot method for clearing all data from the UI and from memory.
         """
-        self.ui.events.clear_data()
+        # clear event data
+        self.ui.app_data.clear_data()
+
+        # clear filename text display
         self.ui.text_list_display.setText('')
+
+        # clear any image from display and reset to blank screen
+        scene = QGraphicsScene()
+        scene.clear()
+        self.ui.image_display.setScene(scene)
+        self.ui.image_display.show()
 
         return
 
-########################################################################################################################
+    ####################################################################################################################
     def next_button_pushed(self) -> None:
         """
         Slot method for a signal from the next push button.
         """
-        self.__display_image()
+        image = self.ui.app_data.get_next_image()
+        self.__display_image(image=image)
+
+        return
+
+    ####################################################################################################################
+    def previous_button_pushed(self) -> None:
+        """
+        Slot method for a signal from the previous push button.
+        """
+        image = self.ui.app_data.get_previous_image()
+        self.__display_image(image=image)
+
         return
 
 ########################################################################################################################
-    def __display_image(self) -> None:
+    def __display_image(self, image: im.Image) -> None:
         """
         """
         x = self.ui.image_display.x()
@@ -81,11 +106,10 @@ class Slots:
         h = self.ui.image_display.height()
         scene = QGraphicsScene()
 
-        im = self.ui.events.get_next_image()
-        if im is not None:
+        if image is not None:
 
-            im = im.scaled(w, h, Qt.KeepAspectRatio, Qt.FastTransformation)
-            scene.addPixmap(QPixmap.fromImage(im))
+            image = image.scaled(w, h, Qt.KeepAspectRatio, Qt.FastTransformation)
+            scene.addPixmap(QPixmap.fromImage(image))
             self.ui.image_display.setScene(scene)
             self.ui.image_display.show()
 
@@ -107,4 +131,5 @@ class Connections:
         self.__signals.directory_load_pushed.connect(self.__slots.load_directory_button_pushed)
         self.__signals.clear_pushed.connect(self.__slots.clear_button_pushed)
         self.__signals.next_button_pushed.connect(self.__slots.next_button_pushed)
+        self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
 
