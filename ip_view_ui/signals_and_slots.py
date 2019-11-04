@@ -14,7 +14,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtCore import Qt
 
-
+import FileListDisplay
 ########################################################################################################################
 class Signals:
     """
@@ -41,21 +41,7 @@ class Slots:
         :param ui: IPViewWindow object
         """
         self.ui = ui
-
-    ####################################################################################################################
-    def load_directory_button_pushed(self) -> None:
-        """
-        Slot method for loading directory upon load push button.
-        """
-        directory = self.ui.directory_input.toPlainText()
-        files_for_display = self.ui.app_data.load_directory(directory=directory)
-        if len(files_for_display) == 0:
-            self.ui.text_list_display.setText('No Compatible Images')
-        else:
-            string = '\n'.join(map(str, files_for_display))
-            self.ui.text_list_display.setText(string)
-
-        return
+        self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
 
     ####################################################################################################################
     def clear_button_pushed(self) -> None:
@@ -128,7 +114,7 @@ class Connections:
         self.__slots = Slots(ui=self.ui)
 
         # connect signals and slots
-        self.__signals.directory_load_pushed.connect(self.__slots.load_directory_button_pushed)
+        self.__signals.directory_load_pushed.connect(self.__slots.file_list_display.load_directory_button_pushed)
         self.__signals.clear_pushed.connect(self.__slots.clear_button_pushed)
         self.__signals.next_button_pushed.connect(self.__slots.next_button_pushed)
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)

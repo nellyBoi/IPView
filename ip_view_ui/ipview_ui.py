@@ -12,7 +12,7 @@ from ipview_ui_base import Ui_MainWindow  # importing our generated file
 
 
 ########################################################################################################################
-class IPViewWindow(Ui_MainWindow): # QtWidgets.QMainWindow
+class IPViewWindow(Ui_MainWindow):  # QtWidgets.QMainWindow
 
     ####################################################################################################################
     def __init__(self):
