@@ -15,6 +15,8 @@ from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtCore import Qt
 
 import FileListDisplay
+
+
 ########################################################################################################################
 class Signals:
     """
@@ -52,7 +54,7 @@ class Slots:
         self.ui.app_data.clear_data()
 
         # clear filename text display
-        self.ui.text_list_display.setText('')
+        self.file_list_display.clear_list_display()
 
         # clear any image from display and reset to blank screen
         scene = QGraphicsScene()
@@ -69,6 +71,7 @@ class Slots:
         """
         image = self.ui.app_data.get_next_image()
         self.__display_image(image=image)
+        self.file_list_display.display_next_item()
 
         return
 
@@ -79,6 +82,7 @@ class Slots:
         """
         image = self.ui.app_data.get_previous_image()
         self.__display_image(image=image)
+        self.file_list_display.display_previous_item()
 
         return
 

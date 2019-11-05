@@ -34,6 +34,10 @@ class ApplicationData:
     def get_next_image(self) -> im.Image:
         """
         """
+        # check for instantiation of data
+        if self.__image_directory is None:
+            return None
+
         if self.__image_directory.has_next():
             return self.__image_directory.next_image()
         else:
@@ -43,6 +47,10 @@ class ApplicationData:
     def get_previous_image(self) -> im.Image:
         """
         """
+        # check for instantiation of data
+        if self.__image_directory is None:
+            return None
+        
         if self.__image_directory.has_previous():
             return self.__image_directory.previous_image()
         else:
@@ -52,4 +60,4 @@ class ApplicationData:
     def clear_data(self) -> str:
         """
         """
-        self.__image_directory.clear()
+        self.__image_directory = None

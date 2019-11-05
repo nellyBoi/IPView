@@ -27,16 +27,6 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QTextEdit" name="text_list_display">
-    <property name="geometry">
-     <rect>
-      <x>530</x>
-      <y>130</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="directory_load_push">
     <property name="geometry">
      <rect>
@@ -97,6 +87,16 @@
     </property>
     <property name="text">
      <string>previous</string>
+    </property>
+   </widget>
+   <widget class="QListView" name="text_list_display">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>130</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
     </property>
    </widget>
   </widget>
