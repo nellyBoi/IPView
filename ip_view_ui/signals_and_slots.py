@@ -15,6 +15,7 @@ from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtCore import Qt
 
 import FileListDisplay
+import DirectoryDisplay
 
 
 ########################################################################################################################
@@ -31,6 +32,7 @@ class Signals:
         self.clear_pushed = ui.clear_push_button.clicked
         self.next_button_pushed = ui.next_button.clicked
         self.previous_button_pushed = ui.previous_button.clicked
+        self.directory_search_button_pushed = ui.directory_search_push_button.clicked
 
 
 ########################################################################################################################
@@ -44,6 +46,7 @@ class Slots:
         """
         self.ui = ui
         self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
+        self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
 
     ####################################################################################################################
     def clear_button_pushed(self) -> None:
@@ -61,6 +64,7 @@ class Slots:
         scene.clear()
         self.ui.image_display.setScene(scene)
         self.ui.image_display.show()
+        self.directory_display.clear_display()
 
         return
 
@@ -122,4 +126,5 @@ class Connections:
         self.__signals.clear_pushed.connect(self.__slots.clear_button_pushed)
         self.__signals.next_button_pushed.connect(self.__slots.next_button_pushed)
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
+        self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
 

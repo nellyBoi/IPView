@@ -39,25 +39,8 @@ class IPViewWindow(Ui_MainWindow):  # QtWidgets.QMainWindow
 
         self.setupUi(main_window)
 
-        # modify text directory input box
-        self.__modify_directory_input()
-
         # connect all signals and slots
         self.__signal_and_slot_connections = signals_and_slots.Connections(self)
 
         main_window.show()
         sys.exit(app.exec_())
-
-    ####################################################################################################################
-    def __modify_directory_input(self) -> None:
-        """
-        """
-        self.directory_input.setText(r"C:\Nelly\IPView\image_containers\data\images")
-        self.directory_input.setFont(QtGui.QFont('SansSerif', 12))
-        self.directory_input.setStyleSheet("color: rgb(28, 43, 255);")  # change text color
-
-
-
-
-
-

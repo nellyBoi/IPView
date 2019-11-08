@@ -46,7 +46,7 @@ class FileListDisplay(QtWidgets.QListView):
         """
         self.clear_list_display()
 
-        directory = self.ui.directory_input.toPlainText()
+        directory = self.ui.directory_display.toPlainText()
         files_for_display = self.ui.app_data.load_directory(directory=directory)
 
         if len(files_for_display) == 0:
