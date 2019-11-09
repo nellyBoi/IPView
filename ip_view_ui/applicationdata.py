@@ -25,6 +25,7 @@ class ApplicationData:
         """
         """
         self.__directory = directory
+
         self.__image_directory = im_dir.ImageDirectory(directory=directory, buffer_size=BUFFER_SIZE)
         self.__allowable_files = self.__image_directory.get_list_of_allowable_files()
 

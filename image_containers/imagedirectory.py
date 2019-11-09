@@ -261,7 +261,7 @@ class ImageDirectory(DirectoryBuffer):
         """
         self.__directory = directory
         self.__buffer_size = buffer_size
-        self.__acceptable_files = None
+        self.__acceptable_files = []
         self.__num_acceptable_files = None
 
         # get list of compatible files which internally stores in self.__acceptable_files

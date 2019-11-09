@@ -20,6 +20,9 @@ def launch() -> IPViewWindow:
 
 ########################################################################################################################
 def my_exception_hook(exctype, value, traceback):
+    """
+    Method to expose a more verbose trace-bock to the console during application development.
+    """
     # Print the error and traceback
     print(exctype, value, traceback)
     # Call the normal Exception hook after

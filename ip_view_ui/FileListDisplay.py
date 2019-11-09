@@ -47,7 +47,11 @@ class FileListDisplay(QtWidgets.QListView):
         self.clear_list_display()
 
         directory = self.ui.directory_display.toPlainText()
-        files_for_display = self.ui.app_data.load_directory(directory=directory)
+        try:
+            files_for_display = self.ui.app_data.load_directory(directory=directory)
+        except FileNotFoundError as e:
+            print(e)
+            return
 
         if len(files_for_display) == 0:
             item = QStandardItem(FileListDisplay.NO_COMPATIBLE_IMAGE_STR)
