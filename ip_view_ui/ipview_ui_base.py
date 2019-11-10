@@ -40,6 +40,9 @@ class Ui_MainWindow(object):
         self.directory_display = QtWidgets.QTextEdit(self.centralwidget)
         self.directory_display.setGeometry(QtCore.QRect(170, 10, 631, 31))
         self.directory_display.setObjectName("directory_display")
+        self.save_push_button = QtWidgets.QPushButton(self.centralwidget)
+        self.save_push_button.setGeometry(QtCore.QRect(20, 500, 51, 23))
+        self.save_push_button.setObjectName("save_push_button")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 826, 22))
@@ -65,3 +68,4 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+        self.save_push_button.setText(_translate("MainWindow", "Save"))

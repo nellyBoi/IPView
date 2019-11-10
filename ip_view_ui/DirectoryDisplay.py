@@ -16,7 +16,7 @@ class DirectoryDisplay(QtWidgets.QTextEdit):
     """
     """
     FONT = QFont("Helvetica", 12)
-    START_FOLDER = r'C:\Nelly\IPView\image_containers\data\images'  # TODO remove hard path, for quick debug only.
+    START_FOLDER = r'C:\Nelly\IPView\image_containers\images\JPEG'  # TODO remove hard path, for quick debug only.
     EMPTY_DIR_MSG = 'Select Directory'
 
     ####################################################################################################################

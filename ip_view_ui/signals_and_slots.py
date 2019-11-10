@@ -16,6 +16,7 @@ from PyQt5.QtCore import Qt
 
 import FileListDisplay
 import DirectoryDisplay
+import SaveImage
 
 
 ########################################################################################################################
@@ -33,6 +34,7 @@ class Signals:
         self.next_button_pushed = ui.next_button.clicked
         self.previous_button_pushed = ui.previous_button.clicked
         self.directory_search_button_pushed = ui.directory_search_push_button.clicked
+        self.save_button_pushed = ui.save_push_button.clicked
 
 
 ########################################################################################################################
@@ -47,6 +49,7 @@ class Slots:
         self.ui = ui
         self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
         self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
+        self.save_image = SaveImage.SaveImage(ui=ui)
 
     ####################################################################################################################
     def clear_button_pushed(self) -> None:
@@ -102,9 +105,11 @@ class Slots:
 
         if image is not None:
 
+            # TODO we don't want to scale the image here or we will loose data, somehow crunch im w/o data loss.
             image = image.scaled(w, h, Qt.KeepAspectRatio, Qt.FastTransformation)
             scene.addPixmap(QPixmap.fromImage(image))
             self.ui.image_display.setScene(scene)
+            #self.ui.image_display.scene().setSceneRect(x, y, w, h)
             self.ui.image_display.show()
 
 
@@ -127,4 +132,5 @@ class Connections:
         self.__signals.next_button_pushed.connect(self.__slots.next_button_pushed)
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
         self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
+        self.__signals.save_button_pushed.connect(self.__slots.save_image.save_button_pressed)
 
