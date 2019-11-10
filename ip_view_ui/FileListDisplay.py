@@ -6,7 +6,7 @@ A class to control the 'text_list_display' of IPView.
 """
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import (QStandardItem, QStandardItemModel, QFont)
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import (QModelIndex, QPersistentModelIndex)
 
 import ipview_ui
 
@@ -78,6 +78,8 @@ class FileListDisplay(QtWidgets.QListView):
             self.displayed_item_idx += 1
             self.q_item_list[self.displayed_item_idx].setFont(FileListDisplay.SELECTED_FONT)
 
+        self.__keep_current_item_in_view()
+
         return
 
     ####################################################################################################################
@@ -91,6 +93,8 @@ class FileListDisplay(QtWidgets.QListView):
             self.displayed_item_idx -= 1
             self.q_item_list[self.displayed_item_idx].setFont(FileListDisplay.SELECTED_FONT)
 
+        self.__keep_current_item_in_view()
+
         return
 
     ####################################################################################################################
@@ -101,5 +105,15 @@ class FileListDisplay(QtWidgets.QListView):
         self.model.clear()
         self.q_item_list = []
         self.displayed_item_idx = -1
+
+        return
+
+    ####################################################################################################################
+    def __keep_current_item_in_view(self) -> None:
+        """
+        Method to auto-scroll the display box to keep the current item in view.
+        """
+        index = self.model.indexFromItem(self.q_item_list[self.displayed_item_idx])
+        self.ui.text_list_display.scrollTo(index, QtWidgets.QAbstractItemView.EnsureVisible)
 
         return

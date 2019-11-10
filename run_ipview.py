@@ -13,6 +13,7 @@ def run() -> object:
     """
     setup_ipview.setup()
 
+    # import after setup
     import ip_view_ui.ipview_viewer as view
     application = view.launch()
 

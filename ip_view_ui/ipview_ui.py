@@ -42,5 +42,7 @@ class IPViewWindow(Ui_MainWindow):  # QtWidgets.QMainWindow
         # connect all signals and slots
         self.__signal_and_slot_connections = signals_and_slots.Connections(self)
 
+        main_window.setFixedSize(main_window.size())
+
         main_window.show()
         sys.exit(app.exec_())
