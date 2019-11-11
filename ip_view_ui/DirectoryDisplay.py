@@ -39,7 +39,6 @@ class DirectoryDisplay(QtWidgets.QTextEdit):
                                                                       QtWidgets.QFileDialog.ShowDirsOnly)
 
         self.ui.directory_display.setText(directory_string)
-        self.ui.directory_display.setFont(QFont("Helvetica", 8))  # TODO why do we have to drop font size here?
 
     ####################################################################################################################
     def clear_display(self):

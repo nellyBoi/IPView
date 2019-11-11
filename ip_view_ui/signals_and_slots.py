@@ -12,7 +12,7 @@ import image as im
 
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsScene
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (Qt, QRectF)
 
 import FileListDisplay
 import DirectoryDisplay
@@ -97,19 +97,17 @@ class Slots:
     def __display_image(self, image: im.Image) -> None:
         """
         """
-        x = self.ui.image_display.x()
-        y = self.ui.image_display.y()
-        w = self.ui.image_display.width()
-        h = self.ui.image_display.height()
+        # x = self.ui.image_display.x()
+        # y = self.ui.image_display.y()
+        # w = self.ui.image_display.width()
+        # h = self.ui.image_display.height()
         scene = QGraphicsScene()
 
         if image is not None:
-
-            # TODO we don't want to scale the image here or we will loose data, somehow crunch im w/o data loss.
-            image = image.scaled(w, h, Qt.KeepAspectRatio, Qt.FastTransformation)
             scene.addPixmap(QPixmap.fromImage(image))
             self.ui.image_display.setScene(scene)
-            #self.ui.image_display.scene().setSceneRect(x, y, w, h)
+            self.ui.image_display.setSceneRect(QRectF(image.rect()))  # Set scene size to image size
+            self.ui.image_display.fitInView(self.ui.image_display.sceneRect(), Qt.KeepAspectRatio)
             self.ui.image_display.show()
 
 
