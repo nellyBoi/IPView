@@ -5,8 +5,7 @@ Nelly Kane
 Classes to hold containers needed to open directory search, grab directory and place path in display window.
 """
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import (QStandardItem, QStandardItemModel, QFont)
-from PyQt5.QtCore import QSize
+from PyQt5.QtGui import QFont
 
 import ipview_ui
 

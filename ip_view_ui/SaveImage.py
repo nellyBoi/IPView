@@ -3,6 +3,8 @@ Nelly Kane
 11.10.2019
 
 A class to same an image in the current display to a file.
+
+TODO: Errors with save image. add automatic extension.
 """
 from PyQt5.QtWidgets import QWidget, QFileDialog
 
@@ -31,8 +33,8 @@ class SaveImage(QWidget):
         """
         Method to pull up a save-as dialog box and allow the user to save the file in the current image_display.
         """
-        current_image = self.ui.image_display.grab(self.ui.image_display.sceneRect().toRect())
-        image_size = current_image.size()
+        current_image = self.ui.image_display.grab(self.ui.image_display.sceneRect().toRect()).toImage()
+        image_size = self.ui.image_display.sceneRect().getRect()
         self.__save_file_dialog()
 
         if self.file_name is not None:
@@ -50,4 +52,4 @@ class SaveImage(QWidget):
     def has_image(self):
         """ Returns whether or not the scene contains an image pixmap.
         """
-        return self._pixmapHandle is not None
+        pass
