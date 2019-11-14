@@ -62,9 +62,9 @@ class ImageDisplay(QWidget):
         """
         if image is not None:
             self.__scene.clear()
-            self.__scene.setSceneRect(QRectF(image.rect()))  # Set scene size to image size
             self.__scene.addPixmap(QPixmap.fromImage(image))
             self.ui.image_display.setSceneRect(QRectF(image.rect()))
+            # ensures scene rectangle (rect) fits in view port.
             self.ui.image_display.fitInView(self.ui.image_display.sceneRect(), Qt.KeepAspectRatio)
             self.ui.image_display.show()
 

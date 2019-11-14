@@ -4,7 +4,10 @@ Nelly Kane
 
 A class to same an image in the current display to a file.
 
-TODO: Errors with save image. add automatic extension.
+TODO: Errors with save image. Only pixel data in the current viewport is saved, which for viewing purposes (variable
+ size images) has an associated scene set to the rect of the image. To change this, the image view may have to be
+ changed.
+ TODO: add automatic extension.
 """
 from PyQt5.QtWidgets import QWidget, QFileDialog
 
@@ -33,8 +36,9 @@ class SaveImage(QWidget):
         """
         Method to pull up a save-as dialog box and allow the user to save the file in the current image_display.
         """
-        current_image = self.ui.image_display.grab(self.ui.image_display.sceneRect().toRect()).toImage()
+        current_image = self.ui.image_display.grab(self.ui.image_display.viewport().rect()).toImage()
         image_size = self.ui.image_display.sceneRect().getRect()
+
         self.__save_file_dialog()
 
         if self.file_name is not None:
