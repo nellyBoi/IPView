@@ -6,12 +6,13 @@ from PyQt5.QtCore import (Qt, QRectF)
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (QGraphicsScene, QWidget)
 
+import StreamDisplay
 import image as im
 import ipview_ui
 
 
 ########################################################################################################################
-class ImageDisplay(QWidget):
+class ImageDisplay(QGraphicsScene):
     """
     A class to control the image display in the IPView GUI.
     """
@@ -23,11 +24,13 @@ class ImageDisplay(QWidget):
         """
         self.ui = ui
         super(ImageDisplay, self).__init__()
-        self.__scene = QGraphicsScene()
-        self.ui.image_display.setScene(self.__scene)
+        #self.__scene = QGraphicsScene()
+        self.ui.image_display.setScene(self)
 
         # image currently on display
         self.__displayed_image = None
+
+        self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
 
     ####################################################################################################################
     def next_image(self) -> None:
@@ -54,7 +57,7 @@ class ImageDisplay(QWidget):
         """
          Method to clear the image display.
         """
-        self.__scene.clear()
+        self.clear()
         self.ui.image_display.show()
         self.__displayed_image = None  # reset image held in object.
 
@@ -68,13 +71,28 @@ class ImageDisplay(QWidget):
         return self.__displayed_image
 
     ####################################################################################################################
+    def mousePressEvent(self, event):
+        """
+        override method of a mouse click event in QGraphicsView
+        """
+        if self.__displayed_image is None:
+            return
+        
+        x = event.scenePos().x()
+        y = event.scenePos().y()
+
+        self.stream_display.append_row('Pixel: row[{0:.2f}], col[{1:.2f}]'.format(y, x))
+
+        return
+
+    ####################################################################################################################
     def __display_image(self, image: im.Image) -> None:
         """
         """
         if image is not None:
-            self.__scene.clear()
+            self.clear()
             self.__displayed_image = image  # set reference to image in object
-            self.__scene.addPixmap(QPixmap.fromImage(self.__displayed_image))
+            self.addPixmap(QPixmap.fromImage(self.__displayed_image))
             self.ui.image_display.setSceneRect(QRectF(self.__displayed_image.rect()))
 
             # ensures scene rectangle (rect) fits in view port.

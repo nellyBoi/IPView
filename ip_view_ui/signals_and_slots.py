@@ -59,6 +59,7 @@ class Slots:
         """
         self.image_display.next_image()
         self.file_list_display.display_next_item()
+        self.stream_display.clear_text()
 
         return
 
@@ -69,6 +70,7 @@ class Slots:
         """
         self.image_display.previous_image()
         self.file_list_display.display_previous_item()
+        self.stream_display.clear_text()
 
         return
 
