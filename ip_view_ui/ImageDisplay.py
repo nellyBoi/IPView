@@ -81,6 +81,8 @@ class ImageDisplay(QGraphicsScene):
         x = event.scenePos().x()
         y = event.scenePos().y()
 
+        # TODO only display row and col if they are in bounds of the scene rectangle.
+        
         self.stream_display.append_row('Pixel: row[{0:.2f}], col[{1:.2f}]'.format(y, x))
 
         return
