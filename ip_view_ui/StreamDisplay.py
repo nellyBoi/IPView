@@ -27,20 +27,32 @@ class StreamDisplay(Singleton, QWidget):
     """
     A singleton-like class to control the behavior of the stream display.
     """
-    def __init__(self, **kwarg):
+    def __init__(self,
+                 ui: ipview_ui.IPViewWindow):
+
         Singleton.__init__(self)
-        self.kwargs = kwarg
+        QWidget.__init__(self)
+
+        self.ui = ui
 
     ####################################################################################################################
-    def append_row(self, text_rows: str) -> None:
+    def append_row(self, text_row: str) -> None:
         """
         Method to add row of text to display window.
-        :param text_rows: str to be appended to display window
+        :param text_row: str to be appended to display window
         """
+        self.ui.stream_display.append(text_row)
+
+        return
 
     ####################################################################################################################
     def clear_text(self) -> None:
-        pass
+        """
+        Method to clear stream display.
+        """
+        self.ui.stream_display.clear()
+
+        return
 
     ####################################################################################################################
     def __maintain_scroll_pos(self) -> None:

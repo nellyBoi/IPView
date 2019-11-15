@@ -10,6 +10,8 @@ import DirectoryDisplay
 import FileListDisplay
 import ImageDisplay
 import SaveImage
+import StreamDisplay
+
 from ipview_ui import IPViewWindow
 
 
@@ -48,6 +50,8 @@ class Slots:
         self.image_display = ImageDisplay.ImageDisplay(ui=ui)
         self.save_image = SaveImage.SaveImage(ui=ui, image_display_object=self.image_display)
 
+        self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
+
     ####################################################################################################################
     def next_button_pushed(self) -> None:
         """
@@ -77,6 +81,7 @@ class Slots:
         self.file_list_display.clear_list_display()
         self.image_display.clear_display()
         self.directory_display.clear_display()
+        self.stream_display.clear_text()
 
         return
 
