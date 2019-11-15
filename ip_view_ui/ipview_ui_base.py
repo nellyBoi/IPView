@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(819, 542)
+        MainWindow.resize(819, 550)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("background-color: rgb(15, 15, 15);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -49,19 +49,26 @@ class Ui_MainWindow(object):
         self.directory_search_push_button.setStyleSheet("background-color: rgb(96, 181, 255);")
         self.directory_search_push_button.setObjectName("directory_search_push_button")
         self.directory_display = QtWidgets.QTextEdit(self.centralwidget)
-        self.directory_display.setEnabled(False)
+        self.directory_display.setEnabled(True)
         self.directory_display.setGeometry(QtCore.QRect(120, 10, 681, 31))
         font = QtGui.QFont()
         font.setKerning(False)
         self.directory_display.setFont(font)
-        self.directory_display.setAutoFillBackground(True)
         self.directory_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-"border-color: rgb(96, 181, 255);")
+"")
+        self.directory_display.setReadOnly(False)
+        self.directory_display.setOverwriteMode(False)
         self.directory_display.setObjectName("directory_display")
         self.save_push_button = QtWidgets.QPushButton(self.centralwidget)
         self.save_push_button.setGeometry(QtCore.QRect(10, 20, 61, 23))
         self.save_push_button.setStyleSheet("background-color: rgb(96, 181, 255);")
         self.save_push_button.setObjectName("save_push_button")
+        self.stream_display = QtWidgets.QTextEdit(self.centralwidget)
+        self.stream_display.setEnabled(False)
+        self.stream_display.setGeometry(QtCore.QRect(520, 320, 281, 171))
+        self.stream_display.setStyleSheet("color: rgb(255, 255, 255);\n"
+"border: rgb(15, 15, 15);")
+        self.stream_display.setObjectName("stream_display")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 819, 21))
@@ -82,9 +89,4 @@ class Ui_MainWindow(object):
         self.next_button.setText(_translate("MainWindow", "next"))
         self.previous_button.setText(_translate("MainWindow", "previous"))
         self.directory_search_push_button.setText(_translate("MainWindow", "..."))
-        self.directory_display.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.save_push_button.setText(_translate("MainWindow", "Save"))

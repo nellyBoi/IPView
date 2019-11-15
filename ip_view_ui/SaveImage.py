@@ -4,14 +4,13 @@ Nelly Kane
 
 A class to same an image in the current display to a file.
 
-TODO: Errors with save image. Only pixel data in the current viewport is saved, which for viewing purposes (variable
- size images) has an associated scene set to the rect of the image. To change this, the image view may have to be
- changed.
  TODO: add automatic extension.
+ TODO: Why does save maintain image size but drop in file size? Data-type?
 """
 from PyQt5.QtWidgets import QWidget, QFileDialog
 
 import ipview_ui
+import ImageDisplay
 
 
 ########################################################################################################################
@@ -21,23 +20,25 @@ class SaveImage(QWidget):
 
     ####################################################################################################################
     def __init__(self,
-                 ui: ipview_ui.IPViewWindow):
+                 ui: ipview_ui.IPViewWindow,
+                 image_display_object: ImageDisplay.ImageDisplay):
         """
         """
         self.ui = ui
+        self.image_display_object = image_display_object
         super(SaveImage, self).__init__()
         self.file_name = None
-
-        # Store a local handle to the scene's current image pixmap.
-        self.__pixmap_handle = None
 
     ####################################################################################################################
     def save_button_pressed(self) -> None:
         """
         Method to pull up a save-as dialog box and allow the user to save the file in the current image_display.
         """
-        current_image = self.ui.image_display.grab(self.ui.image_display.viewport().rect()).toImage()
-        image_size = self.ui.image_display.sceneRect().getRect()
+        current_image = self.image_display_object.get_displayed_image()
+
+        # no action if image is not available
+        if current_image is None:
+            return
 
         self.__save_file_dialog()
 

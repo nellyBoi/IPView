@@ -26,6 +26,9 @@ class ImageDisplay(QWidget):
         self.__scene = QGraphicsScene()
         self.ui.image_display.setScene(self.__scene)
 
+        # image currently on display
+        self.__displayed_image = None
+
     ####################################################################################################################
     def next_image(self) -> None:
         """
@@ -53,8 +56,16 @@ class ImageDisplay(QWidget):
         """
         self.__scene.clear()
         self.ui.image_display.show()
+        self.__displayed_image = None  # reset image held in object.
 
         return
+
+    ####################################################################################################################
+    def get_displayed_image(self) -> im.Image:
+        """
+        :return: Image currently on display.
+        """
+        return self.__displayed_image
 
     ####################################################################################################################
     def __display_image(self, image: im.Image) -> None:
@@ -62,8 +73,10 @@ class ImageDisplay(QWidget):
         """
         if image is not None:
             self.__scene.clear()
-            self.__scene.addPixmap(QPixmap.fromImage(image))
-            self.ui.image_display.setSceneRect(QRectF(image.rect()))
+            self.__displayed_image = image  # set reference to image in object
+            self.__scene.addPixmap(QPixmap.fromImage(self.__displayed_image))
+            self.ui.image_display.setSceneRect(QRectF(self.__displayed_image.rect()))
+
             # ensures scene rectangle (rect) fits in view port.
             self.ui.image_display.fitInView(self.ui.image_display.sceneRect(), Qt.KeepAspectRatio)
             self.ui.image_display.show()

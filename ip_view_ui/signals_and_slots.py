@@ -46,7 +46,7 @@ class Slots:
         self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
         self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
         self.image_display = ImageDisplay.ImageDisplay(ui=ui)
-        self.save_image = SaveImage.SaveImage(ui=ui)
+        self.save_image = SaveImage.SaveImage(ui=ui, image_display_object=self.image_display)
 
     ####################################################################################################################
     def next_button_pushed(self) -> None:
