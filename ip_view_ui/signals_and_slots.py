@@ -19,6 +19,7 @@ from ipview_ui import IPViewWindow
 class Signals:
     """
     """
+
     def __init__(self, ui: IPViewWindow):
         """
         Instantiation must be the last thing the GUI does.
@@ -39,6 +40,7 @@ class Slots:
     NOTE: Any method defined in here is a slot intended to control multiple functions in the program (i.e. the clear
     may operate on the image display, the directory display and the application data).
     """
+
     def __init__(self, ui: IPViewWindow):
         """
         Instantiation must be the last thing the GUI does.
@@ -92,6 +94,7 @@ class Slots:
 class Connections:
     """
     """
+
     def __init__(self, ui: IPViewWindow):
         """
         Instantiation must be the last thing the GUI does.
@@ -108,4 +111,3 @@ class Connections:
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
         self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
         self.__signals.save_button_pushed.connect(self.__slots.save_image.save_button_pressed)
-

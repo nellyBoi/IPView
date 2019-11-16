@@ -8,7 +8,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import (QStandardItem, QStandardItemModel, QFont)
 
 import ipview_ui
-import StreamDisplay
 
 
 ########################################################################################################################

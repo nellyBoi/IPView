@@ -42,7 +42,7 @@ class Ui_MainWindow(object):
         self.text_list_display.setGeometry(QtCore.QRect(520, 80, 281, 192))
         self.text_list_display.setAutoFillBackground(True)
         self.text_list_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-"border-color: rgb(96, 181, 255);")
+                                             "border-color: rgb(96, 181, 255);")
         self.text_list_display.setObjectName("text_list_display")
         self.directory_search_push_button = QtWidgets.QPushButton(self.centralwidget)
         self.directory_search_push_button.setGeometry(QtCore.QRect(90, 20, 23, 21))
@@ -55,7 +55,7 @@ class Ui_MainWindow(object):
         font.setKerning(False)
         self.directory_display.setFont(font)
         self.directory_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-"")
+                                             "")
         self.directory_display.setReadOnly(False)
         self.directory_display.setOverwriteMode(False)
         self.directory_display.setObjectName("directory_display")
@@ -67,7 +67,7 @@ class Ui_MainWindow(object):
         self.stream_display.setEnabled(False)
         self.stream_display.setGeometry(QtCore.QRect(520, 320, 281, 171))
         self.stream_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-"border: rgb(15, 15, 15);")
+                                          "border: rgb(15, 15, 15);")
         self.stream_display.setObjectName("stream_display")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)

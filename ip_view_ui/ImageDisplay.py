@@ -4,7 +4,7 @@ Nelly Kane
 """
 from PyQt5.QtCore import (Qt, QRectF)
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import (QGraphicsScene, QWidget)
+from PyQt5.QtWidgets import (QGraphicsScene)
 
 import StreamDisplay
 import image as im
@@ -24,7 +24,7 @@ class ImageDisplay(QGraphicsScene):
         """
         self.ui = ui
         super(ImageDisplay, self).__init__()
-        #self.__scene = QGraphicsScene()
+        # self.__scene = QGraphicsScene()
         self.ui.image_display.setScene(self)
 
         # image currently on display
@@ -77,7 +77,7 @@ class ImageDisplay(QGraphicsScene):
         """
         if self.__displayed_image is None:
             return
-        
+
         x = event.scenePos().x()
         y = event.scenePos().y()
 
@@ -107,4 +107,3 @@ class ImageDisplay(QGraphicsScene):
             self.ui.image_display.show()
 
         return
-

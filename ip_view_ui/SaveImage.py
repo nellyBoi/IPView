@@ -9,8 +9,8 @@ A class to same an image in the current display to a file.
 """
 from PyQt5.QtWidgets import QWidget, QFileDialog
 
-import ipview_ui
 import ImageDisplay
+import ipview_ui
 
 
 ########################################################################################################################

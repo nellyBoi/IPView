@@ -27,9 +27,9 @@ class StreamDisplay(Singleton, QWidget):
     """
     A singleton-like class to control the behavior of the stream display.
     """
+
     def __init__(self,
                  ui: ipview_ui.IPViewWindow):
-
         Singleton.__init__(self)
         QWidget.__init__(self)
 
