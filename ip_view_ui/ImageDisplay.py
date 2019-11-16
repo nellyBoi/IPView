@@ -81,8 +81,13 @@ class ImageDisplay(QGraphicsScene):
         x = event.scenePos().x()
         y = event.scenePos().y()
 
-        # TODO only display row and col if they are in bounds of the scene rectangle.
-        
+        height = self.ui.image_display.sceneRect().height()
+        width = self.ui.image_display.sceneRect().width()
+
+        # only print row and col if click within scene
+        if x < 0 or x >= width or y < 0 or y >= height:
+            return
+
         self.stream_display.append_row('Pixel: row[{0:.2f}], col[{1:.2f}]'.format(y, x))
 
         return
