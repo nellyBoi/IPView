@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import (QStandardItem, QStandardItemModel, QFont)
 
 import ipview_ui
+import StreamDisplay
 
 
 ########################################################################################################################
@@ -37,8 +38,9 @@ class FileListDisplay(QtWidgets.QListView):
 
         # list of QStandardItem, each element represents one text line
         self.q_item_list = []
-
         self.displayed_item_idx = -1
+
+        self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
 
     ####################################################################################################################
     def load_directory_button_pushed(self) -> None:
@@ -46,6 +48,7 @@ class FileListDisplay(QtWidgets.QListView):
         Slot method for loading directory upon load push button.
         """
         self.clear_list_display()
+        self.stream_display.clear_text()
 
         directory = self.ui.directory_display.toPlainText()
         try:
