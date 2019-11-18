@@ -4,7 +4,7 @@
 from image_containers import image as im
 from image_containers import imagedirectory as im_dir
 
-BUFFER_SIZE = 3
+BUFFER_SIZE = 5
 
 
 ########################################################################################################################

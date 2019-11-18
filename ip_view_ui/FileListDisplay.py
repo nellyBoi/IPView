@@ -7,8 +7,8 @@ A class to control the 'text_list_display' of IPView.
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import (QStandardItem, QStandardItemModel, QFont)
 
-import ipview_ui
 import StreamDisplay
+import ipview_ui
 
 
 ########################################################################################################################

@@ -37,8 +37,8 @@ class ImageDisplay(QGraphicsScene):
         self.__displayed_image_orig = None
 
         # data members reserved for mouse events and the sharing of data between override methods.
-        self.__orig_scene_pos = None
-        self.__orig_screen_pos = None
+        self.__orig_pos_scene = None
+        self.__orig_pos_screen = None
         self.__current_rubber_band = None
         self.__cropped_image_rect = None
         self.__button_clicked_type = None
@@ -99,27 +99,30 @@ class ImageDisplay(QGraphicsScene):
             return
 
         xy = event.scenePos().toPoint()
-        x = xy.x()
-        y = xy.y()
 
         height = self.ui.image_display.sceneRect().height()
         width = self.ui.image_display.sceneRect().width()
 
-        # return if click is not in image scene
-        if x < 0 or x >= width or y < 0 or y >= height:
-            return
-
         if event.button() == ImageDisplay.CROP_IMAGE:
             self.__button_clicked_type = ImageDisplay.CROP_IMAGE
-            self.__orig_scene_pos = xy
-            self.__orig_screen_pos = event.screenPos()
+
+            # cursor location
+            self.__orig_pos_scene = xy
+            self.__orig_pos_screen = event.screenPos()
+
+            # rubber band for zoom feature
             self.__current_rubber_band = QRubberBand(QRubberBand.Rectangle)
-            self.__current_rubber_band.setGeometry(QRect(self.__orig_screen_pos, self.__orig_screen_pos))
+            self.__current_rubber_band.setGeometry(QRect(self.__orig_pos_screen, self.__orig_pos_screen))
             self.__current_rubber_band.show()
 
         elif event.button() == ImageDisplay.PIXEL_FETCH:
             self.__button_clicked_type = ImageDisplay.PIXEL_FETCH
-            self.stream_display.append_row('Pixel: row[{0:.2f}], col[{1:.2f}]'.format(y, x))
+
+            # return if click is not in image scene
+            if xy.x() < 0 or xy.x() >= width or xy.y() < 0 or xy.y() >= height:
+                return
+
+            self.stream_display.append_row('Pixel: row[{0:.2f}], col[{1:.2f}]'.format(xy.y(), xy.x()))
 
         return
 
@@ -130,8 +133,9 @@ class ImageDisplay(QGraphicsScene):
         """
         if self.__button_clicked_type == ImageDisplay.CROP_IMAGE:
             xy = event.screenPos()
-            current_corner = QPoint(int(xy.x()), int(xy.y()))
-            q_rect = self.__get_q_rect_from_points(corner_one=self.__orig_screen_pos, corner_two=current_corner)
+            current_pos_screen = QPoint(int(xy.x()), int(xy.y()))
+            q_rect = self.__get_q_rect_from_corners(corner_one=self.__orig_pos_screen, corner_two=current_pos_screen,
+                                                    scene_coordinates=False)
             self.__current_rubber_band.setGeometry(q_rect)
 
         return
@@ -143,8 +147,9 @@ class ImageDisplay(QGraphicsScene):
         """
         if self.__button_clicked_type == ImageDisplay.CROP_IMAGE:
             self.__current_rubber_band.hide()
-            self.__cropped_image_rect = self.__get_q_rect_from_points(corner_one=self.__orig_scene_pos,
-                                                                      corner_two=event.scenePos().toPoint())
+            self.__cropped_image_rect = self.__get_q_rect_from_corners(corner_one=self.__orig_pos_scene,
+                                                                       corner_two=event.scenePos().toPoint(),
+                                                                       scene_coordinates=True)
             self.__crop_info_to_stream()
             self.__current_rubber_band.deleteLater()
             cropped_image = self.__displayed_image.copy(self.__cropped_image_rect)
@@ -181,12 +186,17 @@ class ImageDisplay(QGraphicsScene):
         return
 
     ####################################################################################################################
-    def __get_q_rect_from_points(self, corner_one: QPoint, corner_two: QPoint) -> QRect:
+    def __get_q_rect_from_corners(self, corner_one: QPoint, corner_two: QPoint,
+                                  scene_coordinates: bool = False) -> QRect:
         """
         Method to return QRect box compatible with image indexing. The need for this function is to allow capabilities
         of zoom to be captured from a box creation in any direction, instead of forcing an upper-left to lower-right
         box creation.
-        :return: QRect in the format (QPoint [upper-left], QPoint[lower-right])
+        :param corner_one: a corner of either screen or scene
+        :param corner_two: a corner opposite of corner_one
+        :param scene_coordinates: True if corners are in scene coordinates. NOTE: If they are, QRect returned will be
+            within scene QRect.
+        :return: QRect in the format (QPoint [upper-left], QPoint[lower-right]) in input coordinates.
         Note: coordinate system is row -> y, col -> x
         """
         row_1 = corner_one.y()
@@ -199,18 +209,19 @@ class ImageDisplay(QGraphicsScene):
         col_min = min(col_1, col_2)
         col_max = max(col_1, col_2)
 
-        # force corners to be within image
-        height = self.ui.image_display.sceneRect().height()
-        width = self.ui.image_display.sceneRect().width()
+        # force corners to be within image if corners are in scene coordinates.
+        if scene_coordinates:
+            height = self.ui.image_display.sceneRect().height()
+            width = self.ui.image_display.sceneRect().width()
 
-        if row_min < 0:
-            row_min = 0
-        if col_min < 0:
-            col_min = 0
-        if row_max >= height:
-            row_max = height - 1
-        if col_max >= width:
-            col_max = width - 1
+            if row_min < 0:
+                row_min = 0
+            if col_min < 0:
+                col_min = 0
+            if row_max >= height:
+                row_max = height - 1
+            if col_max >= width:
+                col_max = width - 1
 
         upper_left = QPoint(col_min, row_min)
         lower_right = QPoint(col_max, row_max)
@@ -223,4 +234,5 @@ class ImageDisplay(QGraphicsScene):
         Method to write image crop information to stream.
         """
         self.stream_display.append_row('Image Cropped, New Parameters: ')
-        self.stream_display.append_row(str(self.__cropped_image_rect))
+        self.stream_display.append_row('Rows: {0:.2f}, Columns: {1:.2f}'.format(self.__cropped_image_rect.height(),
+                                                                                self.__cropped_image_rect.width()))
