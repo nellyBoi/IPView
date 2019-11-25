@@ -2,10 +2,11 @@
 Nelly Kane
 11.24.2019
 """
-from PyQt5.QtWidgets import (QSlider, QGraphicsSceneMouseEvent)
+from PyQt5.QtWidgets import QSlider
 
 import ipview_ui
 import StreamDisplay
+import ImageDisplay
 
 
 ########################################################################################################################
@@ -17,60 +18,44 @@ class Contrast(QSlider):
 
     ####################################################################################################################
     def __init__(self,
-                 ui: ipview_ui.IPViewWindow):
+                 ui: ipview_ui.IPViewWindow,
+                 image_display: ImageDisplay):
         """
         """
         self.ui = ui
-        self = self.ui.contrastAdjust
+        self.__image_display = image_display
+
+        self.__contrast = self.ui.contrast_adjust
         super(Contrast, self).__init__()
 
-        self.setValue(Contrast.START_SLIDE_VALUE)
-        self.setMinimum(Contrast.MIN_SLIDE_VALUE)
-        self.setMaximum(Contrast.MAX_SLIDE_VALUE)
+        self.__contrast.setValue(Contrast.START_SLIDE_VALUE)
+        self.__contrast.setMinimum(Contrast.MIN_SLIDE_VALUE)
+        self.__contrast.setMaximum(Contrast.MAX_SLIDE_VALUE)
+
+        self.__current_val = Contrast.START_SLIDE_VALUE
+        self.__current_image = None
 
         self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
 
     ####################################################################################################################
-    def adjust(self) -> None:
+    def adjust(self, write_to_stream: bool = True) -> None:
         """
         Method to change and control contrast on user input.
         """
-        self.stream_display.append_row('HELLO')
+        self.__current_val = self.__contrast.value()
+        # grab current image
+        self.__current_image = self.__image_display.get_displayed_image()
+        # operate
+        # place back image object
+        # TODO Can we operate on the image in place? How do we extract the data from QImage?
+
+        if write_to_stream:
+            self.stream_display.append_row(str(self.__current_val))
 
         return
 
     ####################################################################################################################
-    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+    def __new_contrast(self) -> None:
         """
-        Override method of a mouse click event in QGraphicsView.
+        Method to compute new contrast. TODO Re-org maybe?
         """
-        self.adjust()
-
-        return
-
-    ####################################################################################################################
-    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        """
-        Override method to move rubber band while mouse button is pressed.
-        """
-        self.adjust()
-
-        return
-
-    ####################################################################################################################
-    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        """
-        Override method to adjust contrast of image.
-        """
-        self.adjust()
-
-        return
-
-    ####################################################################################################################
-    def sliderMoved(self, position: int) -> None:
-        """
-        :param position: new position
-        """
-        self.adjust()
-
-        return

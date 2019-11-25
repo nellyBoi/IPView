@@ -5,6 +5,7 @@ Nelly Kane
 Controlling the streaming feature in IPView.
 """
 from PyQt5.QtWidgets import QWidget
+import PyQt5.QtCore as QtCore
 
 import ipview_ui
 
@@ -34,6 +35,7 @@ class StreamDisplay(Singleton, QWidget):
         QWidget.__init__(self)
 
         self.ui = ui
+        self.ui.stream_display.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
     ####################################################################################################################
     def append_row(self, text_row: str) -> None:
@@ -42,6 +44,7 @@ class StreamDisplay(Singleton, QWidget):
         :param text_row: str to be appended to display window
         """
         self.ui.stream_display.append(text_row)
+        self.__maintain_scroll_pos()
 
         return
 
@@ -56,4 +59,10 @@ class StreamDisplay(Singleton, QWidget):
 
     ####################################################################################################################
     def __maintain_scroll_pos(self) -> None:
-        pass
+        """
+        Method to maintain scroll of stream.
+        """
+        self.ui.stream_display.verticalScrollBar().setValue(self.ui.stream_display.verticalScrollBar().maximum())
+        # TODO implement mouse click if we want scroll bar activated.
+
+        return

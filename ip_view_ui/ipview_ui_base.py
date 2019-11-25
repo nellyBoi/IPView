@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(830, 563)
+        MainWindow.resize(830, 564)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("background-color: rgb(15, 15, 15);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -71,10 +71,10 @@ class Ui_MainWindow(object):
 "                        border: rgb(15, 15, 15);\n"
 "                    ")
         self.stream_display.setObjectName("stream_display")
-        self.contrastAdjust = QtWidgets.QSlider(self.centralwidget)
-        self.contrastAdjust.setGeometry(QtCore.QRect(10, 500, 160, 22))
-        self.contrastAdjust.setOrientation(QtCore.Qt.Horizontal)
-        self.contrastAdjust.setObjectName("contrastAdjust")
+        self.contrast_adjust = QtWidgets.QSlider(self.centralwidget)
+        self.contrast_adjust.setGeometry(QtCore.QRect(10, 500, 160, 22))
+        self.contrast_adjust.setOrientation(QtCore.Qt.Horizontal)
+        self.contrast_adjust.setObjectName("contrast_adjust")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 830, 21))

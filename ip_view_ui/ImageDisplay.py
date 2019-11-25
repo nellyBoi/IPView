@@ -28,7 +28,6 @@ class ImageDisplay(QGraphicsScene):
         """
         self.ui = ui
         super(ImageDisplay, self).__init__()
-        # self.__scene = QGraphicsScene()
         self.ui.image_display.setScene(self)
         self.__q_graphics_view = self.ui.image_display
 
