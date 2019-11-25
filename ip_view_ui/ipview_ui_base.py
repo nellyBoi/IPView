@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(819, 550)
+        MainWindow.resize(830, 563)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("background-color: rgb(15, 15, 15);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -42,7 +42,8 @@ class Ui_MainWindow(object):
         self.text_list_display.setGeometry(QtCore.QRect(520, 80, 281, 192))
         self.text_list_display.setAutoFillBackground(True)
         self.text_list_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-                                             "border-color: rgb(96, 181, 255);")
+"                        border-color: rgb(96, 181, 255);\n"
+"                    ")
         self.text_list_display.setObjectName("text_list_display")
         self.directory_search_push_button = QtWidgets.QPushButton(self.centralwidget)
         self.directory_search_push_button.setGeometry(QtCore.QRect(90, 20, 23, 21))
@@ -55,7 +56,7 @@ class Ui_MainWindow(object):
         font.setKerning(False)
         self.directory_display.setFont(font)
         self.directory_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-                                             "")
+"                    ")
         self.directory_display.setReadOnly(False)
         self.directory_display.setOverwriteMode(False)
         self.directory_display.setObjectName("directory_display")
@@ -67,11 +68,16 @@ class Ui_MainWindow(object):
         self.stream_display.setEnabled(False)
         self.stream_display.setGeometry(QtCore.QRect(520, 320, 281, 171))
         self.stream_display.setStyleSheet("color: rgb(255, 255, 255);\n"
-                                          "border: rgb(15, 15, 15);")
+"                        border: rgb(15, 15, 15);\n"
+"                    ")
         self.stream_display.setObjectName("stream_display")
+        self.contrastAdjust = QtWidgets.QSlider(self.centralwidget)
+        self.contrastAdjust.setGeometry(QtCore.QRect(10, 500, 160, 22))
+        self.contrastAdjust.setOrientation(QtCore.Qt.Horizontal)
+        self.contrastAdjust.setObjectName("contrastAdjust")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 819, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 830, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)

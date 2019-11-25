@@ -6,6 +6,7 @@ signals_and_slots.py
 
 IPView signals, slots and connections.
 """
+import Contrast
 import DirectoryDisplay
 import FileListDisplay
 import ImageDisplay
@@ -50,6 +51,7 @@ class Slots:
         self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
         self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
         self.image_display = ImageDisplay.ImageDisplay(ui=ui)
+        self.contrast_adjust = Contrast.Contrast(ui=ui)
         self.save_image = SaveImage.SaveImage(ui=ui, image_display_object=self.image_display)
 
         self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
