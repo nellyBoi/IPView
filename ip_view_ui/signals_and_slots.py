@@ -53,7 +53,7 @@ class Slots:
         self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
         self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
         self.image_display = ImageDisplay.ImageDisplay(ui=ui)
-        self.contrast_adjust = Contrast.Contrast(ui=ui)
+        self.contrast_adjust = Contrast.Contrast(ui=ui, image_display=self.image_display)
         self.save_image = SaveImage.SaveImage(ui=ui, image_display_object=self.image_display)
 
         self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)

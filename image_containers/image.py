@@ -8,7 +8,9 @@ A module for holding, accessing and manipulating image data.
 import ntpath
 import os
 from enum import Enum
+from typing import Union
 
+import PyQt5.QtCore as QtCore
 import numpy as np
 from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QImage
@@ -20,6 +22,8 @@ from PyQt5.QtWidgets import QWidget
 
 
 ########################################################################################################################
+
+
 class NotImplementedException(BaseException):
     """
     Exception raised when a file-read was executed and the conversion to a QImage object is not possible due to an
@@ -72,7 +76,7 @@ class Image(QImage):
         return self.__name
 
     ####################################################################################################################
-    def get_pixel_value(self, x: int, y: int) -> tuple:
+    def get_pixel_value(self, x: int, y: int) -> Union[int, tuple]:
         """
         :param x: row pixel
         :param y: col pixel
@@ -87,16 +91,32 @@ class Image(QImage):
         raise NotImplementedException
 
     ####################################################################################################################
+    def convertToFormat(self, format: QImage.Format,
+                        flags: Union[QtCore.Qt.ImageConversionFlags, QtCore.Qt.ImageConversionFlag] = None) -> 'Image':
+        """
+        Override method for converting image to a new format
+        :param format: new QImage.Format
+        :param flags:
+        :return:
+        """
+        if flags is None:
+            new_image = super().convertToFormat(format)
+        else:
+            new_image = super().convertToFormat(format, flags)
+
+        new_image.__class__ = Image
+
+        return new_image
+
+    ####################################################################################################################
     def __array_to_q_image(self, im: np.ndarray, copy=False) -> None:
         """
         A method to convert an underlying numpy array of image data into a QImage object.
         :param im: numpy.ndarray of image data
         :param copy: boolean to copy underlying array
         :return: None
+        TODO test this.
         """
-        if im is None:
-            self = QImage()
-
         if im.dtype == np.uint8:
             if len(im.shape) == 2:
                 super().__init__(im.data, im.shape[1], im.shape[0], im.strides[0], QImage.Format_Indexed8)
@@ -156,8 +176,7 @@ class Window(QWidget):
 ########################################################################################################################
 if __name__ == '__main__':
 
-    # IMAGE = "data/polarbear.jpg"
-    IMAGE = "data/tiger.png"
+    IMAGE = "images/JPEG/bunny.jpg"
     import sys
 
     app = QApplication(sys.argv)
@@ -165,8 +184,15 @@ if __name__ == '__main__':
     q_image = Image(file_name=IMAGE)
     if q_image.isNull():
         print('AN ISSUE GETTING THE IMAGE')
+    else:
+        print('IMAGE FORMAT: ' + str(q_image.format()))
+        q_image = q_image.convertToFormat(QImage.Format_ARGB32)
+        q_image = q_image.createAlphaMask()
+        q_image.__class__ = Image
+        print('NEW FORMAT: ' + str(q_image.format()))
+        print('NEW IMAGE TYPE: ' + str(type(q_image)))
 
-    print('Pixel Value: ' + str(q_image.get_pixel_value(x=500, y=400)))
+    #print('Pixel Value: ' + str(q_image.get_pixel_value(x=500, y=400)))
 
     w = Window(image=q_image)
     w.show()
