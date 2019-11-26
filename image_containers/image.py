@@ -12,7 +12,6 @@ from typing import Union
 
 import PyQt5.QtCore as QtCore
 import numpy as np
-from PyQt5.QtGui import QColor
 from PyQt5.QtGui import QImage
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import qRgb
@@ -76,33 +75,18 @@ class Image(QImage):
         return self.__name
 
     ####################################################################################################################
-    def get_pixel_value(self, x: int, y: int) -> Union[int, tuple]:
-        """
-        :param x: row pixel
-        :param y: col pixel
-        :return: RGB value for an RBG image, grayscale value for a grayscale image
-        """
-        val = self.pixel(x, y)
-        if self.format() == QImage.Format_ARGB32 or self.format() == QImage.Format_RGB32:
-            return QColor(val).getRgb()
-        if self.format() == QImage.Format_Indexed8:
-            return QColor(val).value()
-
-        raise NotImplementedException
-
-    ####################################################################################################################
-    def convertToFormat(self, format: QImage.Format,
+    def convertToFormat(self, new_format: QImage.Format,
                         flags: Union[QtCore.Qt.ImageConversionFlags, QtCore.Qt.ImageConversionFlag] = None) -> 'Image':
         """
         Override method for converting image to a new format
-        :param format: new QImage.Format
-        :param flags:
-        :return:
+        :param new_format: new QImage.Format
+        :param flags: Union value
+        :return: new Image object of type new_format.
         """
         if flags is None:
-            new_image = super().convertToFormat(format)
+            new_image = super().convertToFormat(new_format)
         else:
-            new_image = super().convertToFormat(format, flags)
+            new_image = super().convertToFormat(new_format, flags)
 
         new_image.__class__ = Image
 
@@ -184,17 +168,14 @@ if __name__ == '__main__':
     q_image = Image(file_name=IMAGE)
     if q_image.isNull():
         print('AN ISSUE GETTING THE IMAGE')
+
     else:
         print('IMAGE FORMAT: ' + str(q_image.format()))
         q_image = q_image.convertToFormat(QImage.Format_ARGB32)
-        q_image = q_image.createAlphaMask()
         q_image.__class__ = Image
         print('NEW FORMAT: ' + str(q_image.format()))
         print('NEW IMAGE TYPE: ' + str(type(q_image)))
 
-    #print('Pixel Value: ' + str(q_image.get_pixel_value(x=500, y=400)))
-
-    w = Window(image=q_image)
-    w.show()
-
-    sys.exit(app.exec_())
+        w = Window(image=q_image)
+        w.show()
+        sys.exit(app.exec_())

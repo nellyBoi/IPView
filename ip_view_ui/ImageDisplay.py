@@ -235,3 +235,10 @@ class ImageDisplay(QGraphicsScene):
         self.stream_display.append_row('Image Cropped, New Parameters: ')
         self.stream_display.append_row('Rows: {0:.2f}, Columns: {1:.2f}'.format(self.__cropped_image_rect.height(),
                                                                                 self.__cropped_image_rect.width()))
+
+    ####################################################################################################################
+    def show(self) -> None:
+        """
+        TODO: Possibly remove
+        """
+        self.ui.image_display.show()
