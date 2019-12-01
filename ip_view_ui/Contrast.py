@@ -70,14 +70,23 @@ class Contrast(QSlider):
         return
 
     ####################################################################################################################
+    def reset(self) -> None:
+        """
+        Reset controls to default value.
+        """
+        self.__contrast.setValue(Contrast.START_SLIDE_VALUE)
+
+        return
+
+    ####################################################################################################################
     def __loop_image(self) -> None:
         """
         Method to loop image pixel by pixel and change RBG values to adjust contrast
         """
-        for row in range(self._current_image.height()):
-            for col in range(self._current_image.width()):
-                color = self._current_image.pixelColor(row, col)  # QColor
+        for row in range(self._current_image.width()):
+            for col in range(self._current_image.height()):
 
+                color = self._current_image.pixelColor(row, col)  # QColor
                 new_red = Contrast.__clamp(self._contrast_factor*(color.red() - 128) + 128)
                 new_green = Contrast.__clamp(self._contrast_factor * (color.green() - 128) + 128)
                 new_blue = Contrast.__clamp(self._contrast_factor * (color.blue() - 128) + 128)
@@ -85,7 +94,7 @@ class Contrast(QSlider):
 
                 self._current_image.setPixelColor(row, col, new_color)
 
-        self.__image_display.show()
+        self.__image_display.display_image(image=self._current_image)
 
         return
 

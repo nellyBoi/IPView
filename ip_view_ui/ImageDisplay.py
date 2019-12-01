@@ -51,7 +51,7 @@ class ImageDisplay(QGraphicsScene):
         """
         image = self.ui.app_data.get_next_image()
         self.__displayed_image_orig = image
-        self.__display_image(image=image)
+        self.display_image(image=image)
 
         return
 
@@ -62,7 +62,7 @@ class ImageDisplay(QGraphicsScene):
         """
         image = self.ui.app_data.get_previous_image()
         self.__displayed_image_orig = image
-        self.__display_image(image=image)
+        self.display_image(image=image)
 
         return
 
@@ -152,7 +152,7 @@ class ImageDisplay(QGraphicsScene):
             self.__crop_info_to_stream()
             self.__current_rubber_band.deleteLater()
             cropped_image = self.__displayed_image.copy(self.__cropped_image_rect)
-            self.__display_image(image=cropped_image)
+            self.display_image(image=cropped_image)
 
         return
 
@@ -162,14 +162,14 @@ class ImageDisplay(QGraphicsScene):
         Override method to display original image.
         """
         self.__button_clicked_type = ImageDisplay.IMAGE_REVERT
-        self.__display_image(image=self.__displayed_image_orig)
+        self.display_image(image=self.__displayed_image_orig)
         self.stream_display.clear_text()
         self.stream_display.append_row("Image reverted to original")
 
         return
 
     ####################################################################################################################
-    def __display_image(self, image: im.Image) -> None:
+    def display_image(self, image: im.Image) -> None:
         """
         """
         if image is not None:
