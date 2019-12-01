@@ -2,6 +2,7 @@
 :file: image.py
 :author: Nelly Kane
 :date_originated: 10.23.2019
+:modifications: 11.30.2019
 
 A module for holding, accessing and manipulating image data.
 """
@@ -14,11 +15,11 @@ import PyQt5.QtCore as QtCore
 import numpy as np
 from PyQt5.QtGui import QImage
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtGui import qRgb
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QWidget
 
+import cv2
 
 ########################################################################################################################
 
@@ -42,11 +43,13 @@ class FileExt(Enum):
 
 
 ########################################################################################################################
-class Image(QImage):
+class Image:
     """
-    Class to hold a single image from a file-read or a numpy.array.
+    Class to hold a single image from a file-read or a numpy.array. The underlying data will be stored as a numpy.array
+    and then passed to the display with a method that ports it's underlying data to a QImage object. Leaving the data as
+    an array will make it faster for image processing, as opposed to leaving it as a QImage object, which would make
+    the frame-to-frame display faster.
     """
-    gray_color_table = [qRgb(i, i, i) for i in range(256)]
 
     ####################################################################################################################
     def __init__(self, array: np.ndarray = None, path: str = None, file_name: str = None, **kwargs):
@@ -56,15 +59,14 @@ class Image(QImage):
         :param kwargs: RESERVED
         """
         if array is not None:
-            self.__array_to_q_image(im=array)
+            self.__array = array
             self.__name = 'from_array'
 
         else:
             if path is not None:
                 file_name = path + file_name
 
-            # create object with constructor of parent class
-            super().__init__(file_name)
+
             self.__name = ntpath.basename(file_name)
 
     ####################################################################################################################
@@ -93,7 +95,7 @@ class Image(QImage):
         return new_image
 
     ####################################################################################################################
-    def __array_to_q_image(self, im: np.ndarray, copy=False) -> None:
+    def to_QImage(self, im: np.ndarray, copy=False) -> None:
         """
         A method to convert an underlying numpy array of image data into a QImage object.
         :param im: numpy.ndarray of image data
