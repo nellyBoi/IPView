@@ -49,7 +49,7 @@ class ImageDisplay(QGraphicsScene):
         """
         Method for a signal from the next push button.
         """
-        image = self.ui.app_data.get_next_image()
+        image = self.ui.app_data.get_next_image().to_QImage()
         self.__displayed_image_orig = image
         self.display_image(image=image)
 
@@ -60,7 +60,7 @@ class ImageDisplay(QGraphicsScene):
         """
         Method for a signal from the previous push button.
         """
-        image = self.ui.app_data.get_previous_image()
+        image = self.ui.app_data.get_previous_image().to_QImage()
         self.__displayed_image_orig = image
         self.display_image(image=image)
 

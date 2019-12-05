@@ -14,14 +14,14 @@ class ApplicationData:
     """
 
     ####################################################################################################################
-    def __init__(self) -> str:
+    def __init__(self):
 
         self.__directory = ""
         self.__image_directory = None
         self.__allowable_files = None
 
     ####################################################################################################################
-    def load_directory(self, directory: str) -> str:
+    def load_directory(self, directory: str) -> list:
         """
         """
         self.__directory = directory
