@@ -7,19 +7,14 @@
 A module for holding, accessing and manipulating image data.
 """
 import ntpath
-import os
-from enum import Enum
-from typing import Union
 
-import PyQt5.QtCore as QtCore
+import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 from PyQt5.QtGui import (QImage, QPixmap, qRgb)
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QWidget
-
-import cv2
-import matplotlib.pyplot as plt
 
 
 ########################################################################################################################
@@ -58,6 +53,36 @@ class Image:
 
             self.__array = plt.imread(file_name, cv2.IMREAD_UNCHANGED)
             self.__name = ntpath.basename(file_name)
+
+        # original state for revert purposes
+        self.__array_orig = self.__array
+
+    ####################################################################################################################
+    def slice_and_store(self, rows: list, cols: list) -> None:
+        """
+        Method to slice this image and store in the object.
+        :param rows: [rowMin, rowMax] list
+        :param cols: [colMin, colMax] list
+        """
+        if len(self.__array.shape) == 2:
+            new_array = self.__array[rows[0]:rows[1], cols[0]:cols[1]]
+            self.__array = new_array.copy()  # copy required to force contiguous memory
+
+        elif len(self.__array.shape) == 3:
+            new_array = self.__array[rows[0]:rows[1], cols[0]:cols[1], :]
+            self.__array = new_array.copy()  # copy required to force contiguous memory
+
+        else:
+            raise NotImplementedException
+
+    ####################################################################################################################
+    def revert_to_original(self) -> None:
+        """
+        Method to revert to original image as it was constructed.
+        """
+        self.__array = self.__array_orig.copy()  # copy required to force contiguous memory
+
+        return
 
     ####################################################################################################################
     def get_name(self) -> str:
@@ -112,20 +137,18 @@ class Window(QWidget):
 
 ########################################################################################################################
 if __name__ == '__main__':
-
     IMAGE = "images/JPEG/bunny.jpg"
     import sys
 
     app = QApplication(sys.argv)
 
     image = Image(file_name=IMAGE)
+    image.slice_and_store(rows=[100, 500], cols=[100, 900])
     qimage = image.to_QImage()
-    if qimage is None:
-        print('AN ISSUE GETTING THE IMAGE')
 
-    else:
-        print('IMAGE FORMAT: ' + str(qimage.format()))
+    print('IMAGE FORMAT: ' + str(qimage.format()))
 
-        w = Window(image=qimage)
-        w.show()
-        sys.exit(app.exec_())
+    w = Window(image=qimage)
+    w.show()
+
+    sys.exit(app.exec_())

@@ -33,7 +33,6 @@ class ImageDisplay(QGraphicsScene):
 
         # image currently on display
         self.__displayed_image = None
-        self.__displayed_image_orig = None
 
         # data members reserved for mouse events and the sharing of data between override methods.
         self.__orig_pos_scene = None
@@ -49,9 +48,10 @@ class ImageDisplay(QGraphicsScene):
         """
         Method for a signal from the next push button.
         """
-        image = self.ui.app_data.get_next_image().to_QImage()
-        self.__displayed_image_orig = image
-        self.display_image(image=image)
+        image = self.ui.app_data.get_next_image()
+        if image is not None:
+            self.__displayed_image = image
+            self.display_image()
 
         return
 
@@ -60,9 +60,10 @@ class ImageDisplay(QGraphicsScene):
         """
         Method for a signal from the previous push button.
         """
-        image = self.ui.app_data.get_previous_image().to_QImage()
-        self.__displayed_image_orig = image
-        self.display_image(image=image)
+        image = self.ui.app_data.get_previous_image()
+        if image is not None:
+            self.__displayed_image = image
+            self.display_image()
 
         return
 
@@ -74,7 +75,6 @@ class ImageDisplay(QGraphicsScene):
         self.clear()
         self.ui.image_display.show()
         self.__displayed_image = None  # reset image held in object
-        self.__displayed_image_orig = None  # reset original image held in object
         self.__cropped_image_rect = None
         self.__button_clicked_type = None
 
@@ -149,10 +149,16 @@ class ImageDisplay(QGraphicsScene):
             self.__cropped_image_rect = self.__get_q_rect_from_corners(corner_one=self.__orig_pos_scene,
                                                                        corner_two=event.scenePos().toPoint(),
                                                                        scene_coordinates=True)
+
+            # numpy slice parameters for image
+            row_min = self.__cropped_image_rect.topLeft().y()
+            row_max = self.__cropped_image_rect.bottomRight().y()
+            col_min = self.__cropped_image_rect.topLeft().x()
+            col_max = self.__cropped_image_rect.bottomRight().x()
+            self.__displayed_image.slice_and_store(rows=[row_min, row_max], cols=[col_min, col_max])
+
             self.__crop_info_to_stream()
-            self.__current_rubber_band.deleteLater()
-            cropped_image = self.__displayed_image.copy(self.__cropped_image_rect)
-            self.display_image(image=cropped_image)
+            self.display_image()
 
         return
 
@@ -162,25 +168,25 @@ class ImageDisplay(QGraphicsScene):
         Override method to display original image.
         """
         self.__button_clicked_type = ImageDisplay.IMAGE_REVERT
-        self.display_image(image=self.__displayed_image_orig)
+        self.__displayed_image.revert_to_original()
+        self.display_image()
         self.stream_display.clear_text()
         self.stream_display.append_row("Image reverted to original")
 
         return
 
     ####################################################################################################################
-    def display_image(self, image: im.Image) -> None:
+    def display_image(self) -> None:
         """
         """
-        if image is not None:
-            self.clear()
-            self.__displayed_image = image  # set reference to image in object
-            self.addPixmap(QPixmap.fromImage(self.__displayed_image))
-            self.ui.image_display.setSceneRect(QRectF(self.__displayed_image.rect()))
+        self.clear()
+        image_for_display = self.__displayed_image.to_QImage()
+        self.addPixmap(QPixmap.fromImage(image_for_display))
+        self.ui.image_display.setSceneRect(QRectF(image_for_display.rect()))
 
-            # ensures scene rectangle (rect) fits in view port.
-            self.ui.image_display.fitInView(self.ui.image_display.sceneRect(), Qt.KeepAspectRatio)
-            self.ui.image_display.show()
+        # ensures scene rectangle (rect) fits in view port.
+        self.ui.image_display.fitInView(self.ui.image_display.sceneRect(), Qt.KeepAspectRatio)
+        self.ui.image_display.show()
 
         return
 

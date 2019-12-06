@@ -6,7 +6,7 @@ signals_and_slots.py
 
 IPView signals, slots and connections.
 """
-import Contrast
+from image_process_controls import Contrast
 import DirectoryDisplay
 import FileListDisplay
 import ImageDisplay
