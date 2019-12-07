@@ -99,8 +99,8 @@ class ImageDisplay(QGraphicsScene):
 
         xy = event.scenePos().toPoint()
 
-        height = self.ui.image_display.sceneRect().height()
-        width = self.ui.image_display.sceneRect().width()
+        height = self.ui.image_display.sceneRect().current_height()
+        width = self.ui.image_display.sceneRect().current_width()
 
         if event.button() == ImageDisplay.CROP_IMAGE:
             self.__button_clicked_type = ImageDisplay.CROP_IMAGE
@@ -216,8 +216,8 @@ class ImageDisplay(QGraphicsScene):
 
         # force corners to be within image if corners are in scene coordinates.
         if scene_coordinates:
-            height = self.ui.image_display.sceneRect().height()
-            width = self.ui.image_display.sceneRect().width()
+            height = self.ui.image_display.sceneRect().current_height()
+            width = self.ui.image_display.sceneRect().current_width()
 
             if row_min < 0:
                 row_min = 0
@@ -239,8 +239,8 @@ class ImageDisplay(QGraphicsScene):
         Method to write image crop information to stream.
         """
         self.stream_display.append_row('Image Cropped, New Parameters: ')
-        self.stream_display.append_row('Rows: {0:.2f}, Columns: {1:.2f}'.format(self.__cropped_image_rect.height(),
-                                                                                self.__cropped_image_rect.width()))
+        self.stream_display.append_row('Rows: {0:.2f}, Columns: {1:.2f}'.format(self.__cropped_image_rect.current_height(),
+                                                                                self.__cropped_image_rect.current_width()))
 
     ####################################################################################################################
     def show(self) -> None:

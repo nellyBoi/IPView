@@ -9,6 +9,8 @@ import ImageDisplay
 import StreamDisplay
 import ipview_ui
 
+from image_processing import ProcessFactory
+
 
 ########################################################################################################################
 class Contrast(QSlider):
@@ -17,7 +19,7 @@ class Contrast(QSlider):
     MAX_SLIDE_VALUE = 100
 
     # TODO Move this somewhere.
-    ALLOWABLE_FORMATS = [4, 5]  # [Format_RBG32, Format_ARBG32]
+    #ALLOWABLE_FORMATS = [4, 5]  # [Format_RBG32, Format_ARBG32]
     MAX_IMAGE_VALUE = 255
     MIN_IMAGE_VALUE = 0
 
@@ -57,12 +59,9 @@ class Contrast(QSlider):
                 'Image Format: ' + str(self._current_image.format) + ' not compatible with contrast adjust.')
             return
 
-        # compute new contrast factor
-        self._contrast_factor = 259 * (self._current_val + 255) / (
-                    255 * (259 - self._current_val))  # note: needs to be stored as a float
-
-        # loop over image and change pixel values
-        self.__loop_image()
+        # use process factory to modify image
+        ProcessFactory.ProcessFactory.adjust_contrast(image=self._current_image, contrast_val=self._current_val)
+        self.__image_display.display_image()
 
         if write_to_stream:
             self.stream_display.append_row(str(self._current_val))
@@ -79,34 +78,14 @@ class Contrast(QSlider):
         return
 
     ####################################################################################################################
-    def __loop_image(self) -> None:
-        """
-        Method to loop image pixel by pixel and change RBG values to adjust contrast
-        """
-        for row in range(self._current_image.width()):
-            for col in range(self._current_image.height()):
-
-                color = self._current_image.pixelColor(row, col)  # QColor
-                new_red = Contrast.__clamp(self._contrast_factor*(color.red() - 128) + 128)
-                new_green = Contrast.__clamp(self._contrast_factor * (color.green() - 128) + 128)
-                new_blue = Contrast.__clamp(self._contrast_factor * (color.blue() - 128) + 128)
-                new_color = QColor(new_red, new_green, new_blue)
-
-                self._current_image.setPixelColor(row, col, new_color)
-
-        self.__image_display.display_image(image=self._current_image)
-
-        return
-
-    ####################################################################################################################
     def __format_compatible(self) -> bool:
         """
         :return: True if image has compatible format.
         """
-        if self._current_image.format() in Contrast.ALLOWABLE_FORMATS:
+        if self._current_image.get_image_format() in ProcessFactory.ProcessFactory.ALLOWABLE_FORMATS:
             return True
 
-        return False
+        return True # TODO Figure out why this isn't working
 
     ####################################################################################################################
     @staticmethod

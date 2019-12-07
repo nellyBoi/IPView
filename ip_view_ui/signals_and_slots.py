@@ -118,6 +118,6 @@ class Connections:
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
         self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
         self.__signals.save_button_pushed.connect(self.__slots.save_image.save_button_pressed)
-        # self.__signals.contrast_adjust_moved.connect(lambda: self.__slots.contrast_adjust.adjust(write_to_stream=False))
+        self.__signals.contrast_adjust_moved.connect(lambda: self.__slots.contrast_adjust.adjust(write_to_stream=False))
         self.__signals.contrast_adjust_released.connect(
             lambda: self.__slots.contrast_adjust.adjust(write_to_stream=True))
