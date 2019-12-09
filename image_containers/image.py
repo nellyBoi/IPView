@@ -79,14 +79,17 @@ class Image:
             print('WARNING: Incompatible image format, may not work with all methods')
 
         # array for modifications will be stored as uint8.
-        self.__array = self.__array_orig.astype(np.uint8)
+        self.__array_processed = self.__array_orig.astype(np.uint8)
+        self.__contrast_value = 0  # TODO possibly use this value to show diff from original.
+
+        # TODO Possibly have 3rd array here so other features have new processed image to work off. How?
 
     ####################################################################################################################
     def replace_data(self, data: np.ndarray) -> None:
         """
         TODO: Figure this out better if it works.
         """
-        self.__array[:, :, :] = data
+        self.__array_processed[:, :, :] = data
 
         return
 
@@ -98,12 +101,12 @@ class Image:
         :param cols: [colMin, colMax] list
         """
         if self.__array_dimensions == 2:
-            new_array = self.__array[rows[0]:rows[1], cols[0]:cols[1]]
-            self.__array = new_array.copy()  # copy required to force contiguous memory
+            new_array = self.__array_processed[rows[0]:rows[1], cols[0]:cols[1]]
+            self.__array_processed = new_array.copy()  # copy required to force contiguous memory
 
         elif self.__array_dimensions == 3:
-            new_array = self.__array[rows[0]:rows[1], cols[0]:cols[1], :]
-            self.__array = new_array.copy()  # copy required to force contiguous memory
+            new_array = self.__array_processed[rows[0]:rows[1], cols[0]:cols[1], :]
+            self.__array_processed = new_array.copy()  # copy required to force contiguous memory
 
         else:
             raise NotImplementedException
@@ -113,7 +116,7 @@ class Image:
         """
         Method to revert to original image as it was constructed.
         """
-        self.__array = self.__array_orig.copy()  # copy required to force contiguous memory
+        self.__array_processed = self.__array_orig.copy()  # copy required to force contiguous memory
 
         return
 
@@ -125,13 +128,21 @@ class Image:
         return self.__name
 
     ####################################################################################################################
-    def get_array(self) -> np.ndarray:
+    def get_processed_array(self) -> np.ndarray:
         """
         :return: Current numpy array.
-        NOTE: This is not the original. If original desired (and has been altered) then call 'revert_to_original' method
-        and then call 'get array'.
+        NOTE: This is not the original.
         """
-        return self.__array
+        return self.__array_processed
+
+    ####################################################################################################################
+    def get_original_array(self) -> np.ndarray:
+        """
+        :return: Original numpy array.
+        NOTE: This is the original, often needed to compute on image (i.e. increasing contrast since operating on
+        already processed image may have undesired accumulations.
+        """
+        return self.__array_orig
 
     ####################################################################################################################
     def get_image_format(self) -> ImageFormat:
@@ -149,10 +160,10 @@ class Image:
         NOTE: It is the responsibility of the user on the call side to know the ImageFormat.
         """
         if self.__array_dimensions == 2:
-            return self.__array[row, col]
+            return self.__array_processed[row, col]
 
         if self.__array_dimensions == 3:
-            return self.__array[row, col, :]
+            return self.__array_processed[row, col, :]
 
         raise NotImplementedException
 
@@ -165,10 +176,10 @@ class Image:
         NOTE: It is the responsibility of the user on the call side to know the ImageFormat.
         """
         if self.__array_dimensions == 2:
-            self.__array[row, col] = new_values
+            self.__array_processed[row, col] = new_values
 
         if self.__array_dimensions == 3:
-            self.__array[row, col, :] = new_values
+            self.__array_processed[row, col, :] = new_values
 
         return
 
@@ -177,14 +188,14 @@ class Image:
         """
         :return: number of columns in current image
         """
-        return len(self.__array[0])
+        return len(self.__array_processed[0])
 
     ####################################################################################################################
     def current_height(self) -> int:
         """
         :return: number of rows in current image
         """
-        return len(self.__array)
+        return len(self.__array_processed)
 
     ####################################################################################################################
     def original_width(self) -> int:
@@ -201,26 +212,36 @@ class Image:
         return len(self.__array_orig)
 
     ####################################################################################################################
+    def save_image(self, file_name: str) -> None:
+        """
+        :param file_name: full path, name and extension to file.
+        """
+        pass
+
+    ####################################################################################################################
     def to_QImage(self) -> QImage:
         """
         A method to convert an underlying numpy array of image data into a QImage object.
         :return: QImage object
         """
-        if self.__array.dtype == np.uint8:
+        if self.__array_processed.dtype == np.uint8:
             if self.__image_format == ImageFormat.GRAY:
-                q_image = QImage(self.__array.data, self.__array.shape[1], self.__array.shape[0],
-                                 self.__array.strides[0], QImage.Format_Indexed8)
+                q_image = QImage(self.__array_processed.data, self.__array_processed.shape[1],
+                                 self.__array_processed.shape[0],
+                                 self.__array_processed.strides[0], QImage.Format_Indexed8)
                 q_image.setColorTable(Image.gray_color_table)
                 return q_image
 
             elif self.__image_format == ImageFormat.RGB:
-                q_image = QImage(self.__array.data, self.__array.shape[1], self.__array.shape[0],
-                                 self.__array.strides[0], QImage.Format_RGB888)  # 24-bit RGB format (8-8-8)
+                q_image = QImage(self.__array_processed.data, self.__array_processed.shape[1],
+                                 self.__array_processed.shape[0],
+                                 self.__array_processed.strides[0], QImage.Format_RGB888)  # 24-bit RGB format (8-8-8)
                 return q_image
 
             elif self.__image_format == ImageFormat.ARGB:
-                q_image = QImage(self.__array.data, self.__array.shape[1], self.__array.shape[0],
-                                 self.__array.strides[0], QImage.Format_ARGB32)  # 32-bit ARGB format
+                q_image = QImage(self.__array_processed.data, self.__array_processed.shape[1],
+                                 self.__array_processed.shape[0],
+                                 self.__array_processed.strides[0], QImage.Format_ARGB32)  # 32-bit ARGB format
                 return q_image
 
         raise NotImplementedException

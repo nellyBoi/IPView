@@ -64,7 +64,7 @@ class Contrast(QSlider):
         self.__image_display.display_image()
 
         if write_to_stream:
-            self.stream_display.append_row(str(self._current_val))
+            self.stream_display.append_row('Contrast: ' + str(self._current_val))
 
         return
 

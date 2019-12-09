@@ -40,7 +40,7 @@ class ProcessFactory:
         contrast_factor = 259 * (contrast_val + 255) / (255 * (259 - contrast_val))
 
         # loop over image and change pixel values
-        current_image = np.array(image.get_array(), dtype=np.float)
+        current_image = np.array(image.get_original_array(), dtype=np.float)
         current_image = ProcessFactory.__clamp(contrast_factor * (current_image - 128) + 128)
         current_image = np.array(current_image, dtype=np.uint8)
         image.replace_data(data=current_image)
