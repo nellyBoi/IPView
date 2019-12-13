@@ -82,7 +82,7 @@ class Contrast(QSlider):
         """
         :return: True if image has compatible format.
         """
-        if self._current_image.get_image_format() in ProcessFactory.ProcessFactory.ALLOWABLE_FORMATS:
+        if self._current_image.get_format() in ProcessFactory.ProcessFactory.ALLOWABLE_FORMATS:
             return True
 
         return True # TODO Figure out why this isn't working

@@ -52,7 +52,7 @@ class ProcessFactory:
         """
         :return: True if image has compatible format.
         """
-        if self.__image_current.get_image_format() in ProcessFactory.ALLOWABLE_FORMATS:
+        if self.__image_current.get_format() in ProcessFactory.ALLOWABLE_FORMATS:
             return True
 
         return False

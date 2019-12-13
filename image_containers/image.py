@@ -38,12 +38,18 @@ class ImageFormat(Enum):
 
 
 ########################################################################################################################
+class ImageDataType(Enum):
+    """
+    An enum to hold image data types compatible with Image class.
+    """
+    UINT8 = 1  # Unsigned integer (0 to 255)
+    #UINT16 = 2  # Unsigned integer (0 to 65535) TODO Unimplemented
+
+########################################################################################################################
 class Image:
     """
-    Class to hold a single image from a file-read or a numpy.array. The underlying data will be stored as a numpy.array
-    and then passed to the display with a method that ports it's underlying data to a QImage object. Leaving the data as
-    an array will make it faster for image processing, as opposed to leaving it as a QImage object, which would make
-    the frame-to-frame display faster.
+    Class to hold image for image processing. The class stores two copies of the image as numpy array's; one copy is the
+    original data as read (for revert purposes) and the other is the processed image.
     """
     gray_color_table = [qRgb(i, i, i) for i in range(256)]
 
@@ -78,11 +84,14 @@ class Image:
         if self.__image_format == 0:
             print('WARNING: Incompatible image format, may not work with all methods')
 
-        # array for modifications will be stored as uint8.
-        self.__array_processed = self.__array_orig.astype(np.uint8)
-        self.__contrast_value = 0  # TODO possibly use this value to show diff from original.
+        self.__image_data_type = 0
+        self.__set_data_type()
 
-        # TODO Possibly have 3rd array here so other features have new processed image to work off. How?
+        self.__array_processed = self.__array_orig.copy()
+
+        # display parameters, so that a crop of the image can be displayed/saved without cropping underlying data
+        self.__cropped_rows = [0, len(self.__array_processed) - 1]
+        self.__cropped_cols = [0, len(self.__array_processed[0]) - 1]
 
     ####################################################################################################################
     def replace_data(self, data: np.ndarray) -> None:
@@ -94,22 +103,16 @@ class Image:
         return
 
     ####################################################################################################################
-    def slice_and_store(self, rows: list, cols: list) -> None:
+    def crop(self, rows: list, cols: list) -> None:
         """
         Method to slice this image and store in the object.
         :param rows: [rowMin, rowMax] list
         :param cols: [colMin, colMax] list
         """
-        if self.__array_dimensions == 2:
-            new_array = self.__array_processed[rows[0]:rows[1], cols[0]:cols[1]]
-            self.__array_processed = new_array.copy()  # copy required to force contiguous memory
+        self.__cropped_rows = rows
+        self.__cropped_cols = cols  # TODO clamp this is values are outside of image.
 
-        elif self.__array_dimensions == 3:
-            new_array = self.__array_processed[rows[0]:rows[1], cols[0]:cols[1], :]
-            self.__array_processed = new_array.copy()  # copy required to force contiguous memory
-
-        else:
-            raise NotImplementedException
+        return
 
     ####################################################################################################################
     def revert_to_original(self) -> None:
@@ -145,11 +148,18 @@ class Image:
         return self.__array_orig
 
     ####################################################################################################################
-    def get_image_format(self) -> ImageFormat:
+    def get_format(self) -> ImageFormat:
         """
         :return: Image format
         """
         return self.__image_format
+
+    ####################################################################################################################
+    def get_data_type(self) -> ImageDataType:
+        """
+        :return: Image data-type
+        """
+        return self.__image_data_type
 
     ####################################################################################################################
     def get_pixel(self, row: int, col: int) -> np.ndarray:
@@ -224,28 +234,46 @@ class Image:
         A method to convert an underlying numpy array of image data into a QImage object.
         :return: QImage object
         """
+        row0 = self.__cropped_rows[0]
+        row1 = self.__cropped_rows[1]
+        col0 = self.__cropped_cols[0]
+        col1 = self.__cropped_cols[1]
+        if self.__array_dimensions == 2:
+            array_cropped = self.__array_processed[row0: row1, col0: col1].copy()
+        elif self.__array_dimensions == 3:
+            array_cropped = self.__array_processed[row0: row1, col0: col1, :].copy()
+        else:
+            raise NotImplementedException
+
         if self.__array_processed.dtype == np.uint8:
             if self.__image_format == ImageFormat.GRAY:
-                q_image = QImage(self.__array_processed.data, self.__array_processed.shape[1],
-                                 self.__array_processed.shape[0],
-                                 self.__array_processed.strides[0], QImage.Format_Indexed8)
+                q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
+                                 array_cropped.strides[0], QImage.Format_Indexed8)
                 q_image.setColorTable(Image.gray_color_table)
                 return q_image
 
             elif self.__image_format == ImageFormat.RGB:
-                q_image = QImage(self.__array_processed.data, self.__array_processed.shape[1],
-                                 self.__array_processed.shape[0],
-                                 self.__array_processed.strides[0], QImage.Format_RGB888)  # 24-bit RGB format (8-8-8)
+                q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
+                                 array_cropped.strides[0], QImage.Format_RGB888)  # 24-bit RGB format (8-8-8)
                 return q_image
 
             elif self.__image_format == ImageFormat.ARGB:
-                q_image = QImage(self.__array_processed.data, self.__array_processed.shape[1],
-                                 self.__array_processed.shape[0],
-                                 self.__array_processed.strides[0], QImage.Format_ARGB32)  # 32-bit ARGB format
+                q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
+                                 array_cropped.strides[0], QImage.Format_ARGB32)  # 32-bit ARGB format
                 return q_image
 
         raise NotImplementedException
 
+    ####################################################################################################################
+    def __set_data_type(self) -> None:
+        """
+        Method to set data-type of image.
+        """
+        if self.__array_orig.dtype == np.uint8:
+            self.__image_data_type = ImageDataType.UINT8
+            return
+
+        raise NotImplementedException
 
 ########################################################################################################################
 class Window(QWidget):
@@ -284,7 +312,7 @@ if __name__ == '__main__':
     w.add_image(image=qimage0)
     w.show()
 
-    image.slice_and_store(rows=[100, 500], cols=[100, 900])
+    image.crop(rows=[100, 500], cols=[100, 900])
     qimage1 = image.to_QImage()
     w2 = Window()
     w2.add_image(image=qimage1)

@@ -155,7 +155,7 @@ class ImageDisplay(QGraphicsScene):
             row_max = self.__cropped_image_rect.bottomRight().y()
             col_min = self.__cropped_image_rect.topLeft().x()
             col_max = self.__cropped_image_rect.bottomRight().x()
-            self.__displayed_image.slice_and_store(rows=[row_min, row_max], cols=[col_min, col_max])
+            self.__displayed_image.crop(rows=[row_min, row_max], cols=[col_min, col_max])
 
             self.__crop_info_to_stream()
             self.display_image()
