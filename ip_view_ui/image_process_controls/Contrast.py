@@ -52,15 +52,10 @@ class Contrast(QSlider):
         """
         self._current_val = self.__contrast.value()
         # grab current image
-        self._current_image = self.__image_display.get_displayed_image()
-
-        if self.__format_compatible() is False:
-            self.stream_display.append_row(
-                'Image Format: ' + str(self._current_image.format) + ' not compatible with contrast adjust.')
-            return
+        self._current_image = self.__image_display.get_process_factory()
 
         # use process factory to modify image
-        ProcessFactory.ProcessFactory.adjust_contrast(image=self._current_image, contrast_val=self._current_val)
+        self._current_image.adjust_contrast(contrast_val=self._current_val)
         self.__image_display.display_image()
 
         if write_to_stream:
@@ -76,16 +71,6 @@ class Contrast(QSlider):
         self.__contrast.setValue(Contrast.START_SLIDE_VALUE)
 
         return
-
-    ####################################################################################################################
-    def __format_compatible(self) -> bool:
-        """
-        :return: True if image has compatible format.
-        """
-        if self._current_image.get_format() in ProcessFactory.ProcessFactory.ALLOWABLE_FORMATS:
-            return True
-
-        return True # TODO Figure out why this isn't working
 
     ####################################################################################################################
     @staticmethod

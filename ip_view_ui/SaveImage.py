@@ -34,7 +34,7 @@ class SaveImage(QWidget):
         """
         Method to pull up a save-as dialog box and allow the user to save the file in the current image_display.
         """
-        current_image = self.image_display_object.get_displayed_image()
+        current_image = self.image_display_object.get_process_factory()
 
         # no action if image is not available
         if current_image is None:

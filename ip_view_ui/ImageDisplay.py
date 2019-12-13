@@ -3,7 +3,7 @@ Nelly Kane
 11.12.2019
 """
 from PyQt5.QtCore import (Qt, QRectF, QRect, QPoint)
-from PyQt5.QtGui import (QPixmap)
+from PyQt5.QtGui import (QPixmap, QImage)
 from PyQt5.QtWidgets import (QGraphicsScene, QRubberBand, QGraphicsSceneMouseEvent)
 
 import StreamDisplay
@@ -12,6 +12,9 @@ import ipview_ui
 
 
 ########################################################################################################################
+from image_processing.ProcessFactory import ProcessFactory
+
+
 class ImageDisplay(QGraphicsScene):
     """
     A class to control the image display in the IPView GUI.
@@ -32,7 +35,7 @@ class ImageDisplay(QGraphicsScene):
         self.__q_graphics_view = self.ui.image_display
 
         # image currently on display
-        self.__displayed_image = None
+        self.__processed_image = None
 
         # data members reserved for mouse events and the sharing of data between override methods.
         self.__orig_pos_scene = None
@@ -50,7 +53,7 @@ class ImageDisplay(QGraphicsScene):
         """
         image = self.ui.app_data.get_next_image()
         if image is not None:
-            self.__displayed_image = image
+            self.__processed_image = ProcessFactory(image=image)
             self.display_image()
 
         return
@@ -62,7 +65,7 @@ class ImageDisplay(QGraphicsScene):
         """
         image = self.ui.app_data.get_previous_image()
         if image is not None:
-            self.__displayed_image = image
+            self.__processed_image = ProcessFactory(image=image)
             self.display_image()
 
         return
@@ -74,18 +77,18 @@ class ImageDisplay(QGraphicsScene):
         """
         self.clear()
         self.ui.image_display.show()
-        self.__displayed_image = None  # reset image held in object
+        self.__processed_image = None  # reset image held in object
         self.__cropped_image_rect = None
         self.__button_clicked_type = None
 
         return
 
     ####################################################################################################################
-    def get_displayed_image(self) -> im.Image:
+    def get_process_factory(self) -> QImage:
         """
         :return: Image currently on display.
         """
-        return self.__displayed_image
+        return self.__processed_image
 
     ####################################################################################################################
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
@@ -94,7 +97,7 @@ class ImageDisplay(QGraphicsScene):
         - Left button provides the cropping feature.
         - Right button provides the pixel value.
         """
-        if self.__displayed_image is None:
+        if self.__processed_image is None:
             return
 
         xy = event.scenePos().toPoint()
@@ -155,7 +158,7 @@ class ImageDisplay(QGraphicsScene):
             row_max = self.__cropped_image_rect.bottomRight().y()
             col_min = self.__cropped_image_rect.topLeft().x()
             col_max = self.__cropped_image_rect.bottomRight().x()
-            self.__displayed_image.crop(rows=[row_min, row_max], cols=[col_min, col_max])
+            self.__processed_image.crop(rows=[row_min, row_max], cols=[col_min, col_max])
 
             self.__crop_info_to_stream()
             self.display_image()
@@ -168,7 +171,7 @@ class ImageDisplay(QGraphicsScene):
         Override method to display original image.
         """
         self.__button_clicked_type = ImageDisplay.IMAGE_REVERT
-        self.__displayed_image.revert_to_original()
+        self.__processed_image.revert_to_original()
         self.display_image()
         self.stream_display.clear_text()
         self.stream_display.append_row("Image reverted to original")
@@ -180,7 +183,7 @@ class ImageDisplay(QGraphicsScene):
         """
         """
         self.clear()
-        image_for_display = self.__displayed_image.to_QImage()
+        image_for_display = self.__processed_image.to_QImage()
         self.addPixmap(QPixmap.fromImage(image_for_display))
         self.ui.image_display.setSceneRect(QRectF(image_for_display.rect()))
 
