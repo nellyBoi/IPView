@@ -43,7 +43,7 @@ class SaveImage(QWidget):
         self.__save_file_dialog()
 
         if self.file_name is not None:
-            current_image.save(self.file_name)
+            current_image.save_image(self.file_name)
 
     ####################################################################################################################
     def __save_file_dialog(self):

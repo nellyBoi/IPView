@@ -17,7 +17,6 @@ from PyQt5.QtWidgets import QWidget
 
 ########################################################################################################################
 class ProcessFactory:
-
     MIN_CONTRAST_VALUE = -100
     MAX_CONTRAST_VALUE = 100
 
@@ -30,13 +29,15 @@ class ProcessFactory:
     def __init__(self, image: im.Image):
         """
         """
-        self._image = image
-        self.__processed_array = self._image.get_array().copy()
-        self.__image_float = np.array(image.get_array(), dtype=float)  # for computation purposes
+        self.__image = image
+        self.__processed_array = self.__image.get_array().copy()
+        self.__image_float = np.array(self.__image.get_array(), dtype=float)  # for computation purposes
 
         # check that processed array is compatible with the ProcessFactory
         if not self.__compatible():
             raise im.NotImplementedException
+
+        self.__original_size = [self.__image.get_height(), self.__image.get_width()]
 
         self.__image_min = 0
         self.__image_max = 0
@@ -45,6 +46,7 @@ class ProcessFactory:
         # set cropped rows and columns as entire image
         self.__cropped_rows = [0, len(self.__processed_array) - 1]
         self.__cropped_cols = [0, len(self.__processed_array[0]) - 1]
+        self.__cropped_upper_left = [0, 0]
 
     ####################################################################################################################
     def adjust_contrast(self, contrast_val: int) -> None:
@@ -54,7 +56,7 @@ class ProcessFactory:
         if contrast_val < ProcessFactory.MIN_CONTRAST_VALUE:
             contrast_val = ProcessFactory.MIN_CONTRAST_VALUE
 
-        if self._image.get_data_type() == im.ImageDataType.UINT8.name:
+        if self.__image.get_data_type() == im.ImageDataType.UINT8.name:
             # compute new contrast factor  NOTE: needs to be stored as a float
             contrast_factor = 259 * (contrast_val + 255) / (255 * (259 - contrast_val))
 
@@ -73,8 +75,18 @@ class ProcessFactory:
         :param rows: [rowMin, rowMax] list
         :param cols: [colMin, colMax] list
         """
-        self.__cropped_rows = rows
-        self.__cropped_cols = cols  # TODO clamp this is values are outside of image.
+        if rows[0] < 0:
+            rows[0] = 0
+        if rows[1] > self.__original_size[0]:
+            rows[1] = self.__original_size[0]
+        if cols[0] < 0:
+            cols[0] = 0
+        if cols[1] > self.__original_size[1]:
+            cols[1] = self.__original_size[1]
+
+        self.__cropped_rows = [x + self.__cropped_upper_left[0] for x in rows]
+        self.__cropped_cols = [x + self.__cropped_upper_left[1] for x in cols]
+        self.__cropped_upper_left = [self.__cropped_upper_left[0] + rows[0], self.__cropped_upper_left[1] + cols[0]]
 
         return
 
@@ -83,16 +95,21 @@ class ProcessFactory:
         """
         Method to revert to original image as it was constructed.
         """
-        self.__processed_array = self._image.get_array().copy()  # copy required to force contiguous memory
+        self.__processed_array = self.__image.get_array().copy()  # copy required to force contiguous memory
+        self.__cropped_rows = [0, len(self.__processed_array) - 1]
+        self.__cropped_cols = [0, len(self.__processed_array[0]) - 1]
+        self.__cropped_upper_left = [0, 0]
 
         return
 
     ####################################################################################################################
     def save_image(self, file_name: str) -> None:
         """
-        :param file_name: full path, name and extension to file. TODO NEW
+        :param file_name: full path, name and extension to file.
         """
-        pass
+        self.to_QImage().save(file_name)
+
+        return
 
     ####################################################################################################################
     def to_QImage(self) -> QImage:
@@ -104,26 +121,26 @@ class ProcessFactory:
         row1 = self.__cropped_rows[1]
         col0 = self.__cropped_cols[0]
         col1 = self.__cropped_cols[1]
-        if self._image.get_dimensions() == 2:
+        if self.__image.get_dimensions() == 2:
             array_cropped = self.__processed_array[row0: row1, col0: col1].copy()
-        elif self._image.get_dimensions() == 3:
+        elif self.__image.get_dimensions() == 3:
             array_cropped = self.__processed_array[row0: row1, col0: col1, :].copy()
         else:
             raise im.NotImplementedException
 
-        if self._image.get_data_type() == im.ImageDataType.UINT8.name:
-            if self._image.get_format() == im.ImageFormat.GRAY.name:
+        if self.__image.get_data_type() == im.ImageDataType.UINT8.name:
+            if self.__image.get_format() == im.ImageFormat.GRAY.name:
                 q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
                                  array_cropped.strides[0], QImage.Format_Indexed8)
                 q_image.setColorTable(ProcessFactory.gray_color_table)
                 return q_image
 
-            elif self._image.get_format() == im.ImageFormat.RGB.name:
+            elif self.__image.get_format() == im.ImageFormat.RGB.name:
                 q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
                                  array_cropped.strides[0], QImage.Format_RGB888)  # 24-bit RGB format (8-8-8)
                 return q_image
 
-            elif self._image.get_format() == im.ImageFormat.ARGB.name:
+            elif self.__image.get_format() == im.ImageFormat.ARGB.name:
                 q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
                                  array_cropped.strides[0], QImage.Format_ARGB32)  # 32-bit ARGB format
                 return q_image
@@ -135,10 +152,10 @@ class ProcessFactory:
         """
         :return: True if image has compatible format and data type
         """
-        if self._image.get_format() not in ProcessFactory.ALLOWABLE_FORMATS:
+        if self.__image.get_format() not in ProcessFactory.ALLOWABLE_FORMATS:
             return False
 
-        if self._image.get_data_type() not in ProcessFactory.ALLOWABLE_DATA_TYPES:
+        if self.__image.get_data_type() not in ProcessFactory.ALLOWABLE_DATA_TYPES:
             return False
 
         return True
@@ -148,7 +165,7 @@ class ProcessFactory:
         """
         Method to set range of image based on image type.
         """
-        if self._image.get_data_type() == im.ImageDataType.UINT8.name:
+        if self.__image.get_data_type() == im.ImageDataType.UINT8.name:
             self.__image_min = 0
             self.__image_max = 255
 

@@ -84,7 +84,7 @@ class ImageDisplay(QGraphicsScene):
         return
 
     ####################################################################################################################
-    def get_process_factory(self) -> QImage:
+    def get_process_factory(self) -> ProcessFactory:
         """
         :return: Image currently on display.
         """
