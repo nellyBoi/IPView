@@ -6,7 +6,6 @@ signals_and_slots.py
 
 IPView signals, slots and connections.
 """
-from image_process_controls import Contrast
 import DirectoryDisplay
 import FileListDisplay
 import ImageDisplay
@@ -33,8 +32,6 @@ class Signals:
         self.previous_button_pushed = ui.previous_button.clicked
         self.directory_search_button_pushed = ui.directory_search_push_button.clicked
         self.save_button_pushed = ui.save_push_button.clicked
-        self.contrast_adjust_moved = ui.contrast_adjust.sliderMoved
-        self.contrast_adjust_released = ui.contrast_adjust.sliderReleased
 
 
 ########################################################################################################################
@@ -53,7 +50,6 @@ class Slots:
         self.file_list_display = FileListDisplay.FileListDisplay(ui=ui)
         self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
         self.image_display = ImageDisplay.ImageDisplay(ui=ui)
-        self.contrast_adjust = Contrast.Contrast(ui=ui, image_display=self.image_display)
         self.save_image = SaveImage.SaveImage(ui=ui, image_display_object=self.image_display)
 
         self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
@@ -66,7 +62,6 @@ class Slots:
         self.image_display.next_image()
         self.file_list_display.display_next_item()
         self.stream_display.clear_text()
-        self.contrast_adjust.reset()
 
         return
 
@@ -78,7 +73,6 @@ class Slots:
         self.image_display.previous_image()
         self.file_list_display.display_previous_item()
         self.stream_display.clear_text()
-        self.contrast_adjust.reset()
 
         return
 
@@ -92,7 +86,6 @@ class Slots:
         self.image_display.clear_display()
         self.directory_display.clear_display()
         self.stream_display.clear_text()
-        self.contrast_adjust.reset()
 
         return
 
@@ -118,6 +111,4 @@ class Connections:
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
         self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
         self.__signals.save_button_pushed.connect(self.__slots.save_image.save_button_pressed)
-        self.__signals.contrast_adjust_moved.connect(lambda: self.__slots.contrast_adjust.adjust(write_to_stream=False))
-        self.__signals.contrast_adjust_released.connect(
-            lambda: self.__slots.contrast_adjust.adjust(write_to_stream=True))
+

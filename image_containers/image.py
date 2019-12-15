@@ -6,12 +6,16 @@
 
 A module for holding, accessing and manipulating image data.
 """
+import ReadFRED as fred
+
 import ntpath
 from enum import Enum
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+
+import os.path
 
 
 ########################################################################################################################
@@ -29,8 +33,9 @@ class ImageFormat(Enum):
     An enum to hold image types compatible with Image class.
     """
     RGB = 1
-    ARGB = 2
+    ARGB = 2  # TODO how do we know if its this or RGBA?
     GRAY = 3
+    RGBA = 4
 
 
 ########################################################################################################################
@@ -63,7 +68,13 @@ class Image:
             if path is not None:
                 file_name = path + file_name
 
-            self.__array = plt.imread(file_name, cv2.IMREAD_UNCHANGED).copy()
+            # if image is .dat file use the FRED image reader.
+            extension = os.path.splitext(file_name)[1]
+            if extension == '.dat':
+                self.__array = fred.read(filename=file_name)
+            else:
+                self.__array = plt.imread(file_name, cv2.IMREAD_UNCHANGED).copy()
+
             self.__name = ntpath.basename(file_name)
 
         self.__array_dimensions = len(self.__array.shape)
@@ -74,7 +85,7 @@ class Image:
             if self.__array.shape[2] == 3:
                 self.__image_format = ImageFormat.RGB
             elif self.__array.shape[2] == 4:
-                self.__image_format = ImageFormat.ARGB
+                self.__image_format = ImageFormat.RGBA
 
         self.__image_data_type = None
         self.__set_data_type()

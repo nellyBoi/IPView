@@ -251,7 +251,7 @@ class ImageDirectory(DirectoryBuffer):
     Class to iterate through a directory both forwards and backwards while skipping files that are incompatible. Images
     are stored in a buffer.
     """
-    ALLOWABLE_EXTENSIONS = ['.jpg', '.jpeg', '.JPG', '.png', '.PNG', '.tif', '.TIF']
+    ALLOWABLE_EXTENSIONS = ['.jpg', '.jpeg', '.JPG', '.png', '.PNG', '.dat']
 
     ####################################################################################################################
     def __init__(self, directory: str, buffer_size: int = 5):

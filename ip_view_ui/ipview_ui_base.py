@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'ipview_base.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -71,10 +69,6 @@ class Ui_MainWindow(object):
 "                        border: rgb(15, 15, 15);\n"
 "                    ")
         self.stream_display.setObjectName("stream_display")
-        self.contrast_adjust = QtWidgets.QSlider(self.centralwidget)
-        self.contrast_adjust.setGeometry(QtCore.QRect(10, 500, 160, 22))
-        self.contrast_adjust.setOrientation(QtCore.Qt.Horizontal)
-        self.contrast_adjust.setObjectName("contrast_adjust")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 830, 21))
@@ -96,3 +90,4 @@ class Ui_MainWindow(object):
         self.previous_button.setText(_translate("MainWindow", "previous"))
         self.directory_search_push_button.setText(_translate("MainWindow", "..."))
         self.save_push_button.setText(_translate("MainWindow", "Save"))
+
