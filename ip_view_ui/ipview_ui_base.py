@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(830, 582)
+        MainWindow.resize(830, 599)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("background-color: rgb(15, 15, 15);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -87,6 +87,16 @@ class Ui_MainWindow(object):
         self.label_max.setStyleSheet("font: 12pt \"MS Shell Dlg 2\";\n"
 "color: rgb(255, 255, 255);")
         self.label_max.setObjectName("label_max")
+        self.min_pixel_display = QtWidgets.QTextEdit(self.centralwidget)
+        self.min_pixel_display.setGeometry(QtCore.QRect(50, 530, 91, 21))
+        self.min_pixel_display.setStyleSheet("color: rgb(255, 255, 255);\n"
+"                        border: rgb(15, 15, 15);")
+        self.min_pixel_display.setObjectName("min_pixel_display")
+        self.max_pixel_display = QtWidgets.QTextEdit(self.centralwidget)
+        self.max_pixel_display.setGeometry(QtCore.QRect(330, 530, 91, 21))
+        self.max_pixel_display.setStyleSheet("color: rgb(255, 255, 255);\n"
+"                        border: rgb(15, 15, 15);")
+        self.max_pixel_display.setObjectName("max_pixel_display")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 830, 21))

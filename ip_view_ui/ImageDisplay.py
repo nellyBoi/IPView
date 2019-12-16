@@ -55,6 +55,8 @@ class ImageDisplay(QGraphicsScene):
         if image is not None:
             self.__processed_image = ProcessFactory(image=image)
             self.display_image()
+        else:
+            self.clear_display()
 
         return
 
@@ -67,6 +69,8 @@ class ImageDisplay(QGraphicsScene):
         if image is not None:
             self.__processed_image = ProcessFactory(image=image)
             self.display_image()
+        else:
+            self.clear_display()
 
         return
 

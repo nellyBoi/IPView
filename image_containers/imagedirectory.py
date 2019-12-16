@@ -181,7 +181,10 @@ class DirectoryBuffer:
         but the actual file to create and object with is above it by '__buffer_size' positions.
         """
         filename = os.path.join(self.__directory, self.__compatible_files[self.__file_list_replace_idx])
-        self.__data[self.__buffer_replace_idx] = im.Image(file_name=filename)
+        try:
+            self.__data[self.__buffer_replace_idx] = im.Image(file_name=filename)
+        except:
+            print('Incompatible image file')
 
         return
 
@@ -193,7 +196,10 @@ class DirectoryBuffer:
         """
         filename = os.path.join(self.__directory,
                                 self.__compatible_files[self.__file_list_replace_idx - self.__buffer_size + 1])
-        self.__data[self.__buffer_replace_idx] = im.Image(file_name=filename)
+        try:
+            self.__data[self.__buffer_replace_idx] = im.Image(file_name=filename)
+        except:
+            print('Incompatible image file')
 
         return
 

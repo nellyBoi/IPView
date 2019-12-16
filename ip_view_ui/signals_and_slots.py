@@ -14,6 +14,7 @@ import SaveImage
 import StreamDisplay
 
 from ipview_ui import IPViewWindow
+import pixel_range_displays
 
 
 ########################################################################################################################
@@ -33,8 +34,12 @@ class Signals:
         self.previous_button_pushed = ui.previous_button.clicked
         self.directory_search_button_pushed = ui.directory_search_push_button.clicked
         self.save_button_pushed = ui.save_push_button.clicked
+
+        # image process controls
         self.min_value_moved = ui.min_value_slider.sliderMoved
         self.min_value_released = ui.min_value_slider.sliderReleased
+        self.max_value_moved = ui.max_value_slider.sliderMoved
+        self.max_value_released = ui.max_value_slider.sliderReleased
 
 
 ########################################################################################################################
@@ -54,10 +59,15 @@ class Slots:
         self.directory_display = DirectoryDisplay.DirectoryDisplay(ui=ui)
         self.image_display = ImageDisplay.ImageDisplay(ui=ui)
         self.save_image = SaveImage.SaveImage(ui=ui, image_display_object=self.image_display)
-
         self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
 
-        self.min_value_adjust = scaling.AdjustMinimumValue(ui=ui, image_display=self.image_display)
+        # image process controls
+        min_pixel_display = pixel_range_displays.MinimumPixelDisplay(ui=ui)
+        max_pixel_display = pixel_range_displays.MaximumPixelDisplay(ui=ui)
+        self.min_value_adjust = scaling.AdjustMinimumValue(ui=ui, image_display=self.image_display,
+                                                           min_pixel_display=min_pixel_display)
+        self.max_value_adjust = scaling.AdjustMaximumValue(ui=ui, image_display=self.image_display,
+                                                           max_pixel_display=max_pixel_display)
 
     ####################################################################################################################
     def next_button_pushed(self) -> None:
@@ -68,6 +78,7 @@ class Slots:
         self.file_list_display.display_next_item()
         self.stream_display.clear_text()
         self.min_value_adjust.reset()
+        self.max_value_adjust.reset()
 
         return
 
@@ -80,6 +91,7 @@ class Slots:
         self.file_list_display.display_previous_item()
         self.stream_display.clear_text()
         self.min_value_adjust.reset()
+        self.max_value_adjust.reset()
 
         return
 
@@ -94,6 +106,7 @@ class Slots:
         self.directory_display.clear_display()
         self.stream_display.clear_text()
         self.min_value_adjust.reset()
+        self.max_value_adjust.reset()
 
         return
 
@@ -119,7 +132,12 @@ class Connections:
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
         self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
         self.__signals.save_button_pushed.connect(self.__slots.save_image.save_button_pressed)
+
+        # image process controls
         self.__signals.min_value_moved.connect(lambda: self.__slots.min_value_adjust.adjust(write_to_stream=False))
         self.__signals.min_value_released.connect(
             lambda: self.__slots.min_value_adjust.adjust(write_to_stream=True))
+        self.__signals.max_value_moved.connect(lambda: self.__slots.max_value_adjust.adjust(write_to_stream=False))
+        self.__signals.max_value_released.connect(
+            lambda: self.__slots.max_value_adjust.adjust(write_to_stream=True))
 

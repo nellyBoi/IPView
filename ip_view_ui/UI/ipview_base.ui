@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>830</width>
-    <height>582</height>
+    <height>599</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -251,6 +251,34 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string>Max:</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="min_pixel_display">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>530</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+                        border: rgb(15, 15, 15);</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="max_pixel_display">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>530</y>
+      <width>91</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);
+                        border: rgb(15, 15, 15);</string>
     </property>
    </widget>
   </widget>

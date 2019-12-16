@@ -51,6 +51,8 @@ class ProcessFactory:
         # set pixel value scaling parameters
         self.__pixel_min_percent = ProcessFactory.SCALE_RANGE[0]
         self.__pixel_max_percent = ProcessFactory.SCALE_RANGE[1]
+        self.__processed_image_min = self.__image_min
+        self.__processed_image_max = self.__image_max
 
     ####################################################################################################################
     def crop(self, rows: list, cols: list) -> None:
@@ -101,13 +103,16 @@ class ProcessFactory:
         if new_max_percent > ProcessFactory.SCALE_RANGE[1]:
             new_max_percent = ProcessFactory.SCALE_RANGE[1]
 
-        if new_min_percent > new_max_percent:
-            self.__processed_array = np.zeros(shape=[self._image.get_height(), self._image.get_width],
+        if new_min_percent >= new_max_percent:
+            self.__processed_array = np.zeros(shape=[self._image.get_height(), self._image.get_width()],
                                               dtype=self._image.get_array().dtype)
             return
 
         new_min = float(new_min_percent) / 100 * self.__image_max
         new_max = float(new_max_percent) / 100 * self.__image_max
+
+        self.__processed_image_min = new_min
+        self.__processed_image_max = new_max
 
         # reset parameters to new values
         self.__pixel_min_percent = new_min_percent
@@ -130,6 +135,20 @@ class ProcessFactory:
             return
 
         raise im.NotImplementedException
+
+    ####################################################################################################################
+    def get_processed_image_min(self) -> int:
+        """
+        :return: Processed image minimum. NOTE: True min is zero after scaling.
+        """
+        return self.__processed_image_min
+
+    ####################################################################################################################
+    def get_processed_image_max(self) -> int:
+        """
+        :return: Processed image max. NOTE: True max is original image max after scaling.
+        """
+        return self.__processed_image_max
 
     ####################################################################################################################
     def revert_to_original(self) -> None:
@@ -183,7 +202,7 @@ class ProcessFactory:
 
             elif self._image.get_format() == im.ImageFormat.RGBA.name:
                 q_image = QImage(array_cropped.data, array_cropped.shape[1], array_cropped.shape[0],
-                                 array_cropped.strides[0], QImage.Format_ARGB32)  # 32-bit RGBA format
+                                 array_cropped.strides[0], QImage.Format_RGBA8888)  # 32-bit RGBA format
                 return q_image
 
         if self._image.get_data_type() == im.ImageDataType.UINT16.name:
