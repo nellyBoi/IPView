@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(830, 564)
+        MainWindow.resize(830, 582)
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("background-color: rgb(15, 15, 15);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -69,6 +69,24 @@ class Ui_MainWindow(object):
 "                        border: rgb(15, 15, 15);\n"
 "                    ")
         self.stream_display.setObjectName("stream_display")
+        self.min_value_slider = QtWidgets.QSlider(self.centralwidget)
+        self.min_value_slider.setGeometry(QtCore.QRect(50, 500, 160, 19))
+        self.min_value_slider.setOrientation(QtCore.Qt.Horizontal)
+        self.min_value_slider.setObjectName("min_value_slider")
+        self.max_value_slider = QtWidgets.QSlider(self.centralwidget)
+        self.max_value_slider.setGeometry(QtCore.QRect(330, 500, 160, 19))
+        self.max_value_slider.setOrientation(QtCore.Qt.Horizontal)
+        self.max_value_slider.setObjectName("max_value_slider")
+        self.label_min = QtWidgets.QLabel(self.centralwidget)
+        self.label_min.setGeometry(QtCore.QRect(10, 500, 31, 16))
+        self.label_min.setStyleSheet("font: 12pt \"MS Shell Dlg 2\";\n"
+"color: rgb(255, 255, 255);")
+        self.label_min.setObjectName("label_min")
+        self.label_max = QtWidgets.QLabel(self.centralwidget)
+        self.label_max.setGeometry(QtCore.QRect(290, 500, 31, 16))
+        self.label_max.setStyleSheet("font: 12pt \"MS Shell Dlg 2\";\n"
+"color: rgb(255, 255, 255);")
+        self.label_max.setObjectName("label_max")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 830, 21))
@@ -90,4 +108,6 @@ class Ui_MainWindow(object):
         self.previous_button.setText(_translate("MainWindow", "previous"))
         self.directory_search_push_button.setText(_translate("MainWindow", "..."))
         self.save_push_button.setText(_translate("MainWindow", "Save"))
+        self.label_min.setText(_translate("MainWindow", "Min:"))
+        self.label_max.setText(_translate("MainWindow", "Max:"))
 

@@ -18,6 +18,8 @@ from PyQt5.QtWidgets import QWidget
 ########################################################################################################################
 class ProcessFactory:
 
+    SCALE_RANGE = [0, 100]  # max assumed to be 100% of data-type range to start
+
     ALLOWABLE_FORMATS = [im.ImageFormat.RGB.name, im.ImageFormat.RGBA.name, im.ImageFormat.GRAY.name]
     ALLOWABLE_DATA_TYPES = [im.ImageDataType.UINT8.name, im.ImageDataType.UINT16.name]
 
@@ -46,6 +48,10 @@ class ProcessFactory:
         self.__cropped_cols = [0, len(self.__processed_array[0]) - 1]
         self.__cropped_upper_left = [0, 0]
 
+        # set pixel value scaling parameters
+        self.__pixel_min_percent = ProcessFactory.SCALE_RANGE[0]
+        self.__pixel_max_percent = ProcessFactory.SCALE_RANGE[1]
+
     ####################################################################################################################
     def crop(self, rows: list, cols: list) -> None:
         """
@@ -67,6 +73,63 @@ class ProcessFactory:
         self.__cropped_upper_left = [self.__cropped_upper_left[0] + rows[0], self.__cropped_upper_left[1] + cols[0]]
 
         return
+
+    ####################################################################################################################
+    def adjust_range(self, new_min_percent: int = None, new_max_percent: int = None) -> None:
+        """
+        Method to adjust range of image. input parameters are as a percent. Values that fall outside of the percent
+        values are set to their respective boundaries while values that are inside of the range are scaled to use the
+        entire dynamic range of the image.
+        :param new_min_percent: value in [0, 100]
+        :param new_max_percent: value in [0, 100
+        """
+        if new_min_percent is None:
+            new_min_percent = self.__pixel_min_percent
+        if new_max_percent is None:
+            new_max_percent = self.__pixel_max_percent
+
+        if self._image.get_dimensions() != 2:
+            print('3D images not implemented yet for this feature')  # TODO pass this to the stream.
+            return
+
+        if new_min_percent < ProcessFactory.SCALE_RANGE[0]:
+            new_min_percent = ProcessFactory.SCALE_RANGE[0]
+        if new_min_percent > ProcessFactory.SCALE_RANGE[1]:
+            new_min_percent = ProcessFactory.SCALE_RANGE[1]
+        if new_max_percent < ProcessFactory.SCALE_RANGE[0]:
+            new_max_percent = ProcessFactory.SCALE_RANGE[0]
+        if new_max_percent > ProcessFactory.SCALE_RANGE[1]:
+            new_max_percent = ProcessFactory.SCALE_RANGE[1]
+
+        if new_min_percent > new_max_percent:
+            self.__processed_array = np.zeros(shape=[self._image.get_height(), self._image.get_width],
+                                              dtype=self._image.get_array().dtype)
+            return
+
+        new_min = float(new_min_percent) / 100 * self.__image_max
+        new_max = float(new_max_percent) / 100 * self.__image_max
+
+        # reset parameters to new values
+        self.__pixel_min_percent = new_min_percent
+        self.__pixel_max_percent = new_max_percent
+
+        scale_ratio = (self.__image_max - self.__image_min) / (new_max - new_min)
+        current_image = self.__image_float.copy()
+
+        current_image[current_image < new_min] = new_min
+        current_image[current_image > new_max] = new_max
+
+        if self._image.get_data_type() == im.ImageDataType.UINT8.name:
+            self.__processed_array = np.array(np.multiply(np.subtract(current_image, new_min), scale_ratio),
+                                              dtype=np.uint8)
+            return
+
+        if self._image.get_data_type() == im.ImageDataType.UINT16.name:
+            self.__processed_array = np.array(np.multiply(np.subtract(current_image, new_min), scale_ratio),
+                                              dtype=np.uint16)
+            return
+
+        raise im.NotImplementedException
 
     ####################################################################################################################
     def revert_to_original(self) -> None:
@@ -127,7 +190,7 @@ class ProcessFactory:
             if self._image.get_format() == im.ImageFormat.GRAY.name:
 
                 # TODO: Get new version of Qt. Current version doesn't support 16-bit grayscale so for now we will
-                # convert to 8
+                # convert to 8-bit
                 array8 = (array_cropped / 256).astype('uint8')
                 q_image = QImage(array8.data, array8.shape[1], array8.shape[0], array8.strides[0],
                                  QImage.Format_Grayscale8)
@@ -157,6 +220,10 @@ class ProcessFactory:
         if self._image.get_data_type() == im.ImageDataType.UINT8.name:
             self.__image_min = 0
             self.__image_max = 255
+
+        if self._image.get_data_type() == im.ImageDataType.UINT16.name:
+            self.__image_min = 0
+            self.__image_max = 65535
 
         return
 

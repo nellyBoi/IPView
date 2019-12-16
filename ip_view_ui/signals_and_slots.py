@@ -6,6 +6,7 @@ signals_and_slots.py
 
 IPView signals, slots and connections.
 """
+from image_process_controls import scaling
 import DirectoryDisplay
 import FileListDisplay
 import ImageDisplay
@@ -32,6 +33,8 @@ class Signals:
         self.previous_button_pushed = ui.previous_button.clicked
         self.directory_search_button_pushed = ui.directory_search_push_button.clicked
         self.save_button_pushed = ui.save_push_button.clicked
+        self.min_value_moved = ui.min_value_slider.sliderMoved
+        self.min_value_released = ui.min_value_slider.sliderReleased
 
 
 ########################################################################################################################
@@ -54,6 +57,8 @@ class Slots:
 
         self.stream_display = StreamDisplay.StreamDisplay(ui=self.ui)
 
+        self.min_value_adjust = scaling.AdjustMinimumValue(ui=ui, image_display=self.image_display)
+
     ####################################################################################################################
     def next_button_pushed(self) -> None:
         """
@@ -62,6 +67,7 @@ class Slots:
         self.image_display.next_image()
         self.file_list_display.display_next_item()
         self.stream_display.clear_text()
+        self.min_value_adjust.reset()
 
         return
 
@@ -73,6 +79,7 @@ class Slots:
         self.image_display.previous_image()
         self.file_list_display.display_previous_item()
         self.stream_display.clear_text()
+        self.min_value_adjust.reset()
 
         return
 
@@ -86,6 +93,7 @@ class Slots:
         self.image_display.clear_display()
         self.directory_display.clear_display()
         self.stream_display.clear_text()
+        self.min_value_adjust.reset()
 
         return
 
@@ -111,4 +119,7 @@ class Connections:
         self.__signals.previous_button_pushed.connect(self.__slots.previous_button_pushed)
         self.__signals.directory_search_button_pushed.connect(self.__slots.directory_display.directory_dialog_pushed)
         self.__signals.save_button_pushed.connect(self.__slots.save_image.save_button_pressed)
+        self.__signals.min_value_moved.connect(lambda: self.__slots.min_value_adjust.adjust(write_to_stream=False))
+        self.__signals.min_value_released.connect(
+            lambda: self.__slots.min_value_adjust.adjust(write_to_stream=True))
 
